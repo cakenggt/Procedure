@@ -5,7 +5,7 @@ package com.aleclownes.procedure;
  */
 public class ChecklistItem {
 
-    protected String text;
+    protected String text = "";
 
 
 

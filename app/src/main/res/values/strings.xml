@@ -6,4 +6,6 @@
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_checklist">ChecklistActivity</string>
+
+    <string name="default_item_hint">Enter text here...</string>
 </resources>

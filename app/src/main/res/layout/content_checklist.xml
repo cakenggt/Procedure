@@ -10,17 +10,12 @@
     tools:showIn="@layout/activity_checklist"
     tools:context="com.aleclownes.procedure.ChecklistActivity">
 
-    <ScrollView
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/checklistScrollView"
+        android:id="@+id/checklistListView"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" >
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/checklistLinearLayout"></LinearLayout>
-    </ScrollView>
+    </ListView>
 </RelativeLayout>
