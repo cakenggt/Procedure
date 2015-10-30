@@ -1,9 +1,14 @@
 package com.aleclownes.procedure;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,9 +18,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private static String TAG = "MainActivity";
+    List<Checklist> checklists;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +57,17 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        ChecklistManager checklistManager = new ChecklistManagerImpl(this);
+        checklists = checklistManager.getAllChecklists();
+        if (checklists == null){
+            checklists = new ArrayList<Checklist>();
+        }
+        final ListView listView = (ListView) findViewById(R.id.checklistListListView);
+        final ChecklistListAdapter adapter = new ChecklistListAdapter(this, checklists);
+        listView.setAdapter(adapter);
+        registerForContextMenu(listView);
+        Log.d(TAG, "Added adapter");
     }
 
     @Override
@@ -98,5 +125,69 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.checklist_list_context_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        ChecklistManager checklistManager = new ChecklistManagerImpl(this);
+        switch (item.getItemId()) {
+            case R.id.delete:
+                checklistManager.delete(checklists.get((int) info.id).getId());
+                checklists.remove((int) info.id);
+                ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    public class ChecklistListAdapter extends ArrayAdapter<Checklist> {
+        private final Context context;
+        private final List<Checklist> checklists;
+
+        public ChecklistListAdapter(Context context, List<Checklist> checklists){
+            super(context, -1, checklists);
+            this.context = context;
+            this.checklists = checklists;
+        }
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent){
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View rowView = inflater.inflate(R.layout.checklist_list_row, parent, false);
+            Log.d(TAG, "getview");
+            final Checklist checklist = checklists.get(position);
+            TextView textView = (TextView)rowView.findViewById(R.id.checklistText);
+            textView.setText(Long.toString(checklist.getId()));
+            rowView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //TODO set onclicklistener to make intent to call checklist activity and store checklist id in bundle
+                    Log.d(TAG, "on click");
+                    Intent editIntent = new Intent(MainActivity.this, ChecklistActivity.class);
+                    editIntent.putExtra(ChecklistActivity.ID_KEY, checklist.getId());
+                    startActivity(editIntent);
+                }
+            });
+            rowView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    MainActivity.this.openContextMenu(v);
+                    return true;
+                }
+            });
+            return rowView;
+        }
+
     }
 }

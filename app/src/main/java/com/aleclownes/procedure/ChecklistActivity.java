@@ -1,6 +1,7 @@
 package com.aleclownes.procedure;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -27,6 +28,7 @@ import java.util.List;
 public class ChecklistActivity extends AppCompatActivity {
 
     private static final String TAG = "ChecklistActivity";
+    public static final String ID_KEY = "com.aleclownes.procedure.id";
     Checklist checklist;
 
     public Checklist getChecklist(){
@@ -41,7 +43,15 @@ public class ChecklistActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         final ListView listView = (ListView) findViewById(R.id.checklistListView);
         //TODO add support for opening both working and master checklists from different parts of the app here
-        checklist = new MasterChecklist();
+        ChecklistManager checklistManager = new ChecklistManagerImpl(this);
+        Intent intent = getIntent();
+        if (intent != null && intent.getLongExtra(ID_KEY, 0) != 0){
+            checklist = checklistManager.read(intent.getLongExtra(ID_KEY, 0));
+        }
+        else{
+            checklist = new MasterChecklist();
+            checklistManager.create(checklist);
+        }
         //Add adapter
         final ChecklistAdapter adapter = new ChecklistAdapter(this, checklist.getItems());
         listView.setAdapter(adapter);
@@ -67,6 +77,13 @@ public class ChecklistActivity extends AppCompatActivity {
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        ChecklistManager checklistManager = new ChecklistManagerImpl(this);
+        checklistManager.update(checklist);
     }
 
     public class ChecklistAdapter extends ArrayAdapter<ChecklistItem> {

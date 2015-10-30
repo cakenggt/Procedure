@@ -1,5 +1,6 @@
 package com.aleclownes.procedure;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import java.util.List;
  * Checklist abstract class
  * Created by alownes on 10/27/2015.
  */
-public abstract class Checklist {
+public abstract class Checklist implements Serializable {
 
     protected long id;
     protected String title;

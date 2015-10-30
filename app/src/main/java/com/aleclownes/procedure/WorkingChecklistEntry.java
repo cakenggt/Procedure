@@ -1,9 +1,11 @@
 package com.aleclownes.procedure;
 
+import java.io.Serializable;
+
 /**
  * Created by alownes on 10/28/2015.
  */
-public class WorkingChecklistEntry extends ChecklistEntry {
+public class WorkingChecklistEntry extends ChecklistEntry implements Serializable {
 
     protected boolean checked;
 

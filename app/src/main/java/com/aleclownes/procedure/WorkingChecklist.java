@@ -1,11 +1,12 @@
 package com.aleclownes.procedure;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by alownes on 10/27/2015.
  */
-public class WorkingChecklist extends Checklist {
+public class WorkingChecklist extends Checklist implements Serializable {
 
     public WorkingChecklist(MasterChecklist master){
         super.items = new ArrayList<ChecklistItem>();
