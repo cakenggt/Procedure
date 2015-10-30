@@ -10,12 +10,42 @@
     tools:showIn="@layout/activity_checklist"
     tools:context="com.aleclownes.procedure.ChecklistActivity">
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/titleContainer">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/textTitle"
+            android:layout_centerHorizontal="true"
+            android:textStyle="bold"
+            android:layout_alignParentTop="true"
+            android:gravity="center_horizontal" />
+
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editTitle"
+            android:layout_above="@+id/checklistListView"
+            android:layout_centerHorizontal="true"
+            android:hint="@string/checklist_title_hint"
+            android:textStyle="bold"
+            android:layout_alignParentTop="true"
+            android:gravity="center_horizontal" />
+    </LinearLayout>
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/checklistListView"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" >
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/titleContainer">
 
     </ListView>
+
 </RelativeLayout>

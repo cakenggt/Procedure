@@ -11,7 +11,7 @@ import java.util.List;
 public abstract class Checklist implements Serializable {
 
     protected long id;
-    protected String title;
+    protected String title = "";
     protected List<ChecklistItem> items = new ArrayList<ChecklistItem>();
 
     public long getId() {

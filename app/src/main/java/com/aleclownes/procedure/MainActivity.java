@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -31,7 +30,10 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static String TAG = "MainActivity";
-    List<Checklist> checklists;
+    public final static String CHECKLIST_TYPE_KEY = "com.aleclownes.procedure.checklistType";
+    public final static String MASTER_CHECKLIST_KEY = "MASTER";
+    public final static String WORKING_CHECKLIST_KEY = "WORKING";
+    List<Checklist> checklists = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,16 +60,30 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        ChecklistManager checklistManager = new ChecklistManagerImpl(this);
-        checklists = checklistManager.getAllChecklists();
-        if (checklists == null){
-            checklists = new ArrayList<Checklist>();
-        }
         final ListView listView = (ListView) findViewById(R.id.checklistListListView);
         final ChecklistListAdapter adapter = new ChecklistListAdapter(this, checklists);
         listView.setAdapter(adapter);
         registerForContextMenu(listView);
         Log.d(TAG, "Added adapter");
+
+        ChecklistManager checklistManager = new ChecklistManagerImpl(this);
+        Intent intent = getIntent();
+        if (intent != null && intent.getStringExtra(CHECKLIST_TYPE_KEY) != null){
+            switch (intent.getStringExtra(CHECKLIST_TYPE_KEY)){
+                case MASTER_CHECKLIST_KEY:
+                    switchToMasterMode();
+                    break;
+                case WORKING_CHECKLIST_KEY:
+                    switchToWorkingMode();
+                    break;
+                default:
+                    switchToMasterMode();
+                    break;
+            }
+        }
+        else{
+            switchToMasterMode();
+        }
     }
 
     @Override
@@ -108,14 +124,10 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camara) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
+        if (id == R.id.master) {
+            switchToMasterMode();
+        } else if (id == R.id.working) {
+            switchToWorkingMode();
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
@@ -139,15 +151,43 @@ public class MainActivity extends AppCompatActivity
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
+        int checklistIndex = (int) info.id;
+        Checklist checklist = checklists.get(checklistIndex);
         switch (item.getItemId()) {
             case R.id.delete:
                 checklistManager.delete(checklists.get((int) info.id).getId());
-                checklists.remove((int) info.id);
+                checklists.remove(checklistIndex);
                 ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
                 return true;
+            case R.id.edit:
+                Intent editIntent = new Intent(MainActivity.this, ChecklistActivity.class);
+                editIntent.putExtra(ChecklistActivity.ID_KEY, checklist.getId());
+                startActivity(editIntent);
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    private void switchToWorkingMode(){
+        ChecklistManager checklistManager = new ChecklistManagerImpl(this);
+        ((FloatingActionButton)findViewById(R.id.fab)).hide();
+        checklists.clear();
+        for (Checklist check : checklistManager.getAllWorkingChecklists()){
+            checklists.add(check);
+        }
+        ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
+        setTitle("Working Checklists");
+    }
+
+    private void switchToMasterMode(){
+        ChecklistManager checklistManager = new ChecklistManagerImpl(this);
+        ((FloatingActionButton)findViewById(R.id.fab)).show();
+        checklists.clear();
+        for (Checklist check : checklistManager.getAllMasterChecklists()){
+            checklists.add(check);
+        }
+        ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
+        setTitle("Master Checklists");
     }
 
     public class ChecklistListAdapter extends ArrayAdapter<Checklist> {
@@ -168,14 +208,23 @@ public class MainActivity extends AppCompatActivity
             Log.d(TAG, "getview");
             final Checklist checklist = checklists.get(position);
             TextView textView = (TextView)rowView.findViewById(R.id.checklistText);
-            textView.setText(Long.toString(checklist.getId()));
+            textView.setText(Long.toString(checklist.getId()) + ": " + checklist.getTitle());
             rowView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO set onclicklistener to make intent to call checklist activity and store checklist id in bundle
-                    Log.d(TAG, "on click");
+                    Log.d(TAG, "on click, creating working checklist");
+                    WorkingChecklist working;
+                    ChecklistManager checklistManager = new ChecklistManagerImpl(MainActivity.this);
+                    if (checklist instanceof MasterChecklist){
+                        //Create a new working checklist
+                        working = new WorkingChecklist((MasterChecklist)checklist);
+                        checklistManager.create(working);
+                    }
+                    else{
+                        working = (WorkingChecklist)checklist;
+                    }
                     Intent editIntent = new Intent(MainActivity.this, ChecklistActivity.class);
-                    editIntent.putExtra(ChecklistActivity.ID_KEY, checklist.getId());
+                    editIntent.putExtra(ChecklistActivity.ID_KEY, working.getId());
                     startActivity(editIntent);
                 }
             });

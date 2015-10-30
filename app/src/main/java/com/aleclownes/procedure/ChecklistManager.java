@@ -29,4 +29,8 @@ public interface ChecklistManager {
 
     public List<Checklist> getAllChecklists();
 
+    public List<MasterChecklist> getAllMasterChecklists();
+
+    public List<WorkingChecklist> getAllWorkingChecklists();
+
 }

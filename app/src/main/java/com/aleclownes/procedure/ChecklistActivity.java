@@ -2,6 +2,7 @@ package com.aleclownes.procedure;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,11 +13,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -64,6 +67,7 @@ public class ChecklistActivity extends AppCompatActivity {
                 ChecklistActivity.this.checklist.getItems().add(new ChecklistHeader("Test Header"));
                 Log.d(TAG, "Header add button clicked");
                 adapter.notifyDataSetChanged();
+                adapter.setSelected(checklist.getItems().size()-1);
             }
         });
         //Add a new checklist item
@@ -74,8 +78,38 @@ public class ChecklistActivity extends AppCompatActivity {
                 ChecklistActivity.this.checklist.getItems().add(new ChecklistEntry("Test Item"));
                 Log.d(TAG, "Item add button clicked");
                 adapter.notifyDataSetChanged();
+                adapter.setSelected(checklist.getItems().size()-1);
             }
         });
+        TextView title;
+        if (checklist instanceof WorkingChecklist){
+            fabCh.hide();
+            fabCi.hide();
+            title = (TextView)findViewById(R.id.textTitle);
+            ((TextView)findViewById(R.id.editTitle)).setVisibility(View.GONE);
+            setTitle("Checklist");
+            listView.setDivider(null);
+        }
+        else{
+            title = (EditText)findViewById(R.id.editTitle);
+            title.addTextChangedListener(new TextWatcher(){
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    Log.d(TAG, "setting text of title to " + s.toString());
+                    checklist.setTitle(s.toString());
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
+            ((TextView)findViewById(R.id.textTitle)).setVisibility(View.GONE);
+            setTitle("Edit Checklist");
+        }
+        title.setText(checklist.getTitle());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -84,6 +118,42 @@ public class ChecklistActivity extends AppCompatActivity {
         super.onPause();
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
         checklistManager.update(checklist);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent listIntent = new Intent(this, MainActivity.class);
+        if (checklist instanceof WorkingChecklist){
+            listIntent.putExtra(MainActivity.CHECKLIST_TYPE_KEY, MainActivity.WORKING_CHECKLIST_KEY);
+        }
+        else {
+            listIntent.putExtra(MainActivity.CHECKLIST_TYPE_KEY, MainActivity.MASTER_CHECKLIST_KEY);
+        }
+        startActivity(listIntent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_settings:
+                //noinspection SimplifiableIfStatement
+                return true;
+            case android.R.id.home:
+                if (this.checklist instanceof WorkingChecklist){
+                    Intent listIntent = new Intent(this, MainActivity.class);
+                    listIntent.putExtra(MainActivity.CHECKLIST_TYPE_KEY, MainActivity.WORKING_CHECKLIST_KEY);
+                    listIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(listIntent);
+                    return true;
+                }
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public class ChecklistAdapter extends ArrayAdapter<ChecklistItem> {
@@ -108,14 +178,38 @@ public class ChecklistActivity extends AppCompatActivity {
             if (checklist instanceof WorkingChecklist){
                 Log.d(TAG, "working checklist");
                 textView = (TextView)rowView.findViewById(R.id.itemText);
+                ((EditText)rowView.findViewById(R.id.itemEdit)).setVisibility(View.GONE);
                 //Put check box if entry
-                if (item instanceof ChecklistEntry){
-                    //TODO put checkbox
+                if (item instanceof WorkingChecklistEntry){
+                    //TODO put checkbox and click listener
+                    final WorkingChecklistEntry entry = (WorkingChecklistEntry)item;
+                    CheckBox check = new CheckBox(context);
+                    if (entry.isChecked()){
+                        check.setChecked(true);
+                        textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    }
+                    check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                            entry.setChecked(isChecked);
+                            TextView textView = (TextView)((ViewGroup)buttonView.getParent()).findViewById(R.id.itemText);
+                            if (entry.isChecked()){
+                                textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                            }
+                            else{
+                                textView.setPaintFlags(textView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                            }
+                        }
+                    });
+                    ((ViewGroup) rowView).addView(check, 0,
+                            new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT));
                 }
             }
             else if (checklist instanceof MasterChecklist){
                 Log.d(TAG, "master checklist");
                 textView = (EditText)rowView.findViewById(R.id.itemEdit);
+                ((TextView)rowView.findViewById(R.id.itemText)).setVisibility(View.GONE);
                 //TODO Put delete button
                 Button button = new Button(context);
                 button.setText("X");
@@ -136,6 +230,7 @@ public class ChecklistActivity extends AppCompatActivity {
             }
             if (item instanceof ChecklistHeader){
                 textView.setTypeface(null, Typeface.BOLD);
+                textView.setPadding(10, 20, 0, 20);
             }
             textView.setText(item.getText());
 
