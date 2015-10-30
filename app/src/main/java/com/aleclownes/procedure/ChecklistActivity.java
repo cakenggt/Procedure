@@ -14,6 +14,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -171,7 +172,7 @@ public class ChecklistActivity extends AppCompatActivity {
         public View getView(final int position, View convertView, ViewGroup parent){
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View rowView = inflater.inflate(R.layout.checklist_row, parent, false);
+            final View rowView = inflater.inflate(R.layout.checklist_row, parent, false);
             TextView textView;
             final ChecklistItem item = items.get(position);
             //whether the checklist is working or master
@@ -183,27 +184,36 @@ public class ChecklistActivity extends AppCompatActivity {
                 if (item instanceof WorkingChecklistEntry){
                     //TODO put checkbox and click listener
                     final WorkingChecklistEntry entry = (WorkingChecklistEntry)item;
-                    CheckBox check = new CheckBox(context);
+                    final CheckBox check = new CheckBox(context);
                     if (entry.isChecked()){
                         check.setChecked(true);
                         textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     }
-                    check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    check.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                            entry.setChecked(isChecked);
-                            TextView textView = (TextView)((ViewGroup)buttonView.getParent()).findViewById(R.id.itemText);
-                            if (entry.isChecked()){
-                                textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                            }
-                            else{
-                                textView.setPaintFlags(textView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-                            }
+                        public void onClick(View v) {
+                            ((View)v.getParent()).performClick();
                         }
                     });
                     ((ViewGroup) rowView).addView(check, 0,
                             new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                                     ViewGroup.LayoutParams.WRAP_CONTENT));
+                    rowView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            entry.setChecked(!entry.isChecked());
+                            check.setChecked(entry.isChecked());
+                            TextView textView = (TextView)rowView.findViewById(R.id.itemText);
+                            if (entry.isChecked()){
+                                //Add strikethrough
+                                textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                            }
+                            else{
+                                //Remove strikethrough
+                                textView.setPaintFlags(textView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                            }
+                        }
+                    });
                 }
             }
             else if (checklist instanceof MasterChecklist){
