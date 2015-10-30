@@ -8,6 +8,10 @@ import java.io.Serializable;
  */
 public class ChecklistEntry extends ChecklistItem implements Serializable {
 
+    public ChecklistEntry(){
+        this("");
+    }
+
     public ChecklistEntry(String text){
         this.text = text;
     }

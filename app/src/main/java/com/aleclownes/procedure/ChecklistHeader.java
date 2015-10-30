@@ -7,6 +7,10 @@ import java.io.Serializable;
  */
 public class ChecklistHeader extends ChecklistItem implements Serializable {
 
+    public ChecklistHeader(){
+        this("");
+    }
+
     public ChecklistHeader(String text){
         this.text = text;
     }

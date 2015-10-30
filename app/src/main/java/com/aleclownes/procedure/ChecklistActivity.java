@@ -64,7 +64,7 @@ public class ChecklistActivity extends AppCompatActivity {
         fabCh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ChecklistActivity.this.checklist.getItems().add(new ChecklistHeader("Test Header"));
+                ChecklistActivity.this.checklist.getItems().add(new ChecklistHeader());
                 Log.d(TAG, "Header add button clicked");
                 adapter.notifyDataSetChanged();
                 adapter.setSelected(checklist.getItems().size()-1);
@@ -75,7 +75,7 @@ public class ChecklistActivity extends AppCompatActivity {
         fabCi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ChecklistActivity.this.checklist.getItems().add(new ChecklistEntry("Test Item"));
+                ChecklistActivity.this.checklist.getItems().add(new ChecklistEntry());
                 Log.d(TAG, "Item add button clicked");
                 adapter.notifyDataSetChanged();
                 adapter.setSelected(checklist.getItems().size()-1);
