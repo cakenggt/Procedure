@@ -6,7 +6,6 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -14,19 +13,12 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -36,10 +28,6 @@ public class ChecklistActivity extends AppCompatActivity {
     private static final String TAG = "ChecklistActivity";
     public static final String ID_KEY = "com.aleclownes.procedure.id";
     Checklist checklist;
-
-    public Checklist getChecklist(){
-        return checklist;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
