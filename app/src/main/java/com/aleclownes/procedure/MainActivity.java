@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity
         final ListView listView = (ListView) findViewById(R.id.checklistListListView);
         final ChecklistListAdapter adapter = new ChecklistListAdapter(this, checklists);
         listView.setAdapter(adapter);
+        listView.setDivider(null);
         registerForContextMenu(listView);
         Log.d(TAG, "Added adapter");
 
