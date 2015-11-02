@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -195,40 +196,35 @@ public class ChecklistActivity extends AppCompatActivity {
             //whether the checklist is working or master
             if (checklist instanceof WorkingChecklist){
                 Log.d(TAG, "working checklist");
-                textView = (TextView)rowView.findViewById(R.id.itemText);
                 rowView.findViewById(R.id.itemEdit).setVisibility(View.GONE);
                 //Put check box if entry
                 if (item instanceof WorkingChecklistEntry){
                     final WorkingChecklistEntry entry = (WorkingChecklistEntry)item;
-                    final CheckBox check = new CheckBox(context);
+                    rowView.findViewById(R.id.itemText).setVisibility(View.GONE);
+                    final CheckBox check = (CheckBox)rowView.findViewById(R.id.checkBox);
+                    textView = check;
                     if (entry.isChecked()){
                         check.setChecked(true);
                         textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     }
-                    check.setOnClickListener(new View.OnClickListener() {
+                    check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                         @Override
-                        public void onClick(View v) {
-                            ((View)v.getParent()).performClick();
-                        }
-                    });
-                    ((ViewGroup) rowView).addView(check, 0,
-                            new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                    ViewGroup.LayoutParams.WRAP_CONTENT));
-                    rowView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            entry.setChecked(!entry.isChecked());
-                            check.setChecked(entry.isChecked());
-                            TextView textView = (TextView) rowView.findViewById(R.id.itemText);
-                            if (entry.isChecked()) {
+                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                            entry.setChecked(isChecked);
+                            if (isChecked) {
                                 //Add strikethrough
-                                textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                                buttonView.setPaintFlags(buttonView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                             } else {
                                 //Remove strikethrough
-                                textView.setPaintFlags(textView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                                buttonView.setPaintFlags(buttonView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                             }
                         }
                     });
+                }
+                else{
+                    //Is a header
+                    textView = (TextView)rowView.findViewById(R.id.itemText);
+                    rowView.findViewById(R.id.checkBox).setVisibility(View.GONE);
                 }
                 //Remove Delete button
                 rowView.findViewById(R.id.delete).setVisibility(View.GONE);
@@ -239,6 +235,7 @@ public class ChecklistActivity extends AppCompatActivity {
                 Log.d(TAG, "master checklist");
                 textView = (EditText)rowView.findViewById(R.id.itemEdit);
                 rowView.findViewById(R.id.itemText).setVisibility(View.GONE);
+                rowView.findViewById(R.id.checkBox).setVisibility(View.GONE);
                 ImageButton button = (ImageButton)rowView.findViewById(R.id.delete);
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
