@@ -197,6 +197,8 @@ public class MainActivity extends AppCompatActivity
         }
         ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
         setTitle("Working Checklists");
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.getMenu().getItem(1).setChecked(true);
     }
 
     private void switchToMasterMode(){
@@ -208,6 +210,8 @@ public class MainActivity extends AppCompatActivity
         }
         ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
         setTitle("Master Checklists");
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.getMenu().getItem(0).setChecked(true);
     }
 
     public class ChecklistListAdapter extends ArrayAdapter<Checklist> {
