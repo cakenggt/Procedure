@@ -36,7 +36,6 @@ public class ChecklistActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         final DragNDropListView listView = (DragNDropListView) findViewById(R.id.checklistListView);
-        //TODO add support for opening both working and master checklists from different parts of the app here
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
         Intent intent = getIntent();
         if (intent != null && intent.getLongExtra(ID_KEY, 0) != 0){
@@ -58,7 +57,8 @@ public class ChecklistActivity extends AppCompatActivity {
                 ChecklistActivity.this.checklist.getItems().add(new ChecklistHeader());
                 Log.d(TAG, "Header add button clicked");
                 adapter.notifyDataSetChanged();
-                adapter.setSelected(checklist.getItems().size()-1);
+                int newChildIndex = checklist.getItems().size()-1;
+                listView.setSelection(newChildIndex);
             }
         });
         //Add a new checklist item
@@ -69,7 +69,8 @@ public class ChecklistActivity extends AppCompatActivity {
                 ChecklistActivity.this.checklist.getItems().add(new ChecklistEntry());
                 Log.d(TAG, "Item add button clicked");
                 adapter.notifyDataSetChanged();
-                adapter.setSelected(checklist.getItems().size()-1);
+                int newChildIndex = checklist.getItems().size()-1;
+                listView.setSelection(newChildIndex);
             }
         });
         TextView title = (TextView)findViewById(R.id.editTitle);
@@ -116,7 +117,9 @@ public class ChecklistActivity extends AppCompatActivity {
             });
         }
         title.setText(checklist.getTitle());
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -157,6 +160,13 @@ public class ChecklistActivity extends AppCompatActivity {
                     startActivity(listIntent);
                     return true;
                 }
+                else{
+                    Intent listIntent = new Intent(this, MainActivity.class);
+                    listIntent.putExtra(MainActivity.CHECKLIST_TYPE_KEY, MainActivity.MASTER_CHECKLIST_KEY);
+                    listIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(listIntent);
+                    return true;
+                }
         }
 
         return super.onOptionsItemSelected(item);
@@ -184,10 +194,9 @@ public class ChecklistActivity extends AppCompatActivity {
             if (checklist instanceof WorkingChecklist){
                 Log.d(TAG, "working checklist");
                 textView = (TextView)rowView.findViewById(R.id.itemText);
-                ((EditText)rowView.findViewById(R.id.itemEdit)).setVisibility(View.GONE);
+                rowView.findViewById(R.id.itemEdit).setVisibility(View.GONE);
                 //Put check box if entry
                 if (item instanceof WorkingChecklistEntry){
-                    //TODO put checkbox and click listener
                     final WorkingChecklistEntry entry = (WorkingChecklistEntry)item;
                     final CheckBox check = new CheckBox(context);
                     if (entry.isChecked()){
@@ -227,8 +236,7 @@ public class ChecklistActivity extends AppCompatActivity {
             else if (checklist instanceof MasterChecklist){
                 Log.d(TAG, "master checklist");
                 textView = (EditText)rowView.findViewById(R.id.itemEdit);
-                ((TextView)rowView.findViewById(R.id.itemText)).setVisibility(View.GONE);
-                //TODO Put delete button
+                rowView.findViewById(R.id.itemText).setVisibility(View.GONE);
                 ImageButton button = (ImageButton)rowView.findViewById(R.id.delete);
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -288,10 +296,6 @@ public class ChecklistActivity extends AppCompatActivity {
 
         public void setSelected(int selected){
             this.selected = selected;
-        }
-
-        public int getSelected(){
-            return selected;
         }
 
     }

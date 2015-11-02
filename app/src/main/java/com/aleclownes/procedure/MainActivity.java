@@ -158,6 +158,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
@@ -188,6 +189,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void switchToWorkingMode(){
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
         ((FloatingActionButton)findViewById(R.id.fab)).hide();
@@ -201,6 +203,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.getMenu().getItem(1).setChecked(true);
     }
 
+    @SuppressWarnings("unchecked")
     private void switchToMasterMode(){
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
         ((FloatingActionButton)findViewById(R.id.fab)).show();
