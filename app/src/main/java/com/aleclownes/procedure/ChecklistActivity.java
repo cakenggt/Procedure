@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -45,7 +46,7 @@ public class ChecklistActivity extends AppCompatActivity {
         setContentView(R.layout.activity_checklist);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final ListView listView = (ListView) findViewById(R.id.checklistListView);
+        final DragNDropListView listView = (DragNDropListView) findViewById(R.id.checklistListView);
         //TODO add support for opening both working and master checklists from different parts of the app here
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
         Intent intent = getIntent();
@@ -57,8 +58,8 @@ public class ChecklistActivity extends AppCompatActivity {
             checklistManager.create(checklist);
         }
         //Add adapter
-        final ChecklistAdapter adapter = new ChecklistAdapter(this, checklist.getItems());
-        listView.setAdapter(adapter);
+        final ChecklistAdapter adapter = new ChecklistAdapter(this, checklist.getItems(), R.id.handle);
+        listView.setDragNDropAdapter(adapter);
         Log.d(TAG, "Added adapter");
         //Add a new checklist header
         FloatingActionButton fabCh = (FloatingActionButton) findViewById(R.id.fab_ch);
@@ -109,6 +110,21 @@ public class ChecklistActivity extends AppCompatActivity {
             });
             ((TextView)findViewById(R.id.textTitle)).setVisibility(View.GONE);
             setTitle("Edit Checklist");
+            listView.setOnItemDragNDropListener(new DragNDropListView.OnItemDragNDropListener() {
+                @Override
+                public void onItemDrag(DragNDropListView parent, View view, int position, long id) {
+                    Log.d(TAG, "Begin dragging");
+                }
+
+                @Override
+                public void onItemDrop(DragNDropListView parent, View view, int startPosition, int endPosition, long id) {
+                    List<ChecklistItem> items = checklist.getItems();
+                    ChecklistItem item = items.get(startPosition);
+                    items.remove(startPosition);
+                    items.add(endPosition, item);
+                    adapter.notifyDataSetChanged();
+                }
+            });
         }
         title.setText(checklist.getTitle());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -157,13 +173,13 @@ public class ChecklistActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public class ChecklistAdapter extends ArrayAdapter<ChecklistItem> {
+    public class ChecklistAdapter extends DragNDropArrayAdapter<ChecklistItem> {
         private final Context context;
         private final List<ChecklistItem> items;
         private int selected = -1;
 
-        public ChecklistAdapter(Context context, List<ChecklistItem> items){
-            super(context, -1, items);
+        public ChecklistAdapter(Context context, List<ChecklistItem> items, int handler){
+            super(context, -1, items, handler);
             this.context = context;
             this.items = items;
         }
@@ -203,26 +219,28 @@ public class ChecklistActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             entry.setChecked(!entry.isChecked());
                             check.setChecked(entry.isChecked());
-                            TextView textView = (TextView)rowView.findViewById(R.id.itemText);
-                            if (entry.isChecked()){
+                            TextView textView = (TextView) rowView.findViewById(R.id.itemText);
+                            if (entry.isChecked()) {
                                 //Add strikethrough
                                 textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                            }
-                            else{
+                            } else {
                                 //Remove strikethrough
                                 textView.setPaintFlags(textView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                             }
                         }
                     });
                 }
+                //Remove Delete button
+                rowView.findViewById(R.id.delete).setVisibility(View.GONE);
+                //Remove handle
+                rowView.findViewById(R.id.handle).setVisibility(View.GONE);
             }
             else if (checklist instanceof MasterChecklist){
                 Log.d(TAG, "master checklist");
                 textView = (EditText)rowView.findViewById(R.id.itemEdit);
                 ((TextView)rowView.findViewById(R.id.itemText)).setVisibility(View.GONE);
                 //TODO Put delete button
-                Button button = new Button(context);
-                button.setText("X");
+                ImageButton button = (ImageButton)rowView.findViewById(R.id.delete);
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -230,9 +248,6 @@ public class ChecklistActivity extends AppCompatActivity {
                         ChecklistAdapter.this.notifyDataSetChanged();
                     }
                 });
-                ((ViewGroup)rowView).addView(button, 0,
-                        new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT));
             }
             else{
                 //If something strange happens, put it in a text view
@@ -289,6 +304,7 @@ public class ChecklistActivity extends AppCompatActivity {
         public int getSelected(){
             return selected;
         }
+
     }
 
 }

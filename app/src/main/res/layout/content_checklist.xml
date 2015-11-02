@@ -38,7 +38,7 @@
             android:gravity="center_horizontal" />
     </LinearLayout>
 
-    <ListView
+    <com.aleclownes.procedure.DragNDropListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/checklistListView"
@@ -46,6 +46,6 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/titleContainer">
 
-    </ListView>
+    </com.aleclownes.procedure.DragNDropListView>
 
 </RelativeLayout>
