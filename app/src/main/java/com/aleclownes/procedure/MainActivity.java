@@ -82,7 +82,13 @@ public class MainActivity extends AppCompatActivity
             }
         }
         else{
-            switchToMasterMode();
+            if (checklistManager.getAllWorkingChecklists().size() > 0){
+                //If there are any working checklists, switch to working mode
+                switchToWorkingMode();
+            }
+            else{
+                switchToMasterMode();
+            }
         }
     }
 
