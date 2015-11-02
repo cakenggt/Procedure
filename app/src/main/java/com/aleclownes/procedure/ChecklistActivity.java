@@ -58,6 +58,7 @@ public class ChecklistActivity extends AppCompatActivity {
                 Log.d(TAG, "Header add button clicked");
                 adapter.notifyDataSetChanged();
                 int newChildIndex = checklist.getItems().size()-1;
+                adapter.setSelected(newChildIndex);
                 listView.setSelection(newChildIndex);
             }
         });
@@ -70,6 +71,7 @@ public class ChecklistActivity extends AppCompatActivity {
                 Log.d(TAG, "Item add button clicked");
                 adapter.notifyDataSetChanged();
                 int newChildIndex = checklist.getItems().size()-1;
+                adapter.setSelected(newChildIndex);
                 listView.setSelection(newChildIndex);
             }
         });
