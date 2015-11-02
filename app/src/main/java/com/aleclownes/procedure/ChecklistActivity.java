@@ -69,15 +69,16 @@ public class ChecklistActivity extends AppCompatActivity {
                 ChecklistActivity.this.checklist.getItems().add(new ChecklistEntry());
                 Log.d(TAG, "Item add button clicked");
                 adapter.notifyDataSetChanged();
-                int newChildIndex = checklist.getItems().size()-1;
+                int newChildIndex = checklist.getItems().size() - 1;
                 listView.setSelection(newChildIndex);
             }
         });
         TextView title = (TextView)findViewById(R.id.editTitle);
-        title.addTextChangedListener(new TextWatcher(){
+        title.addTextChangedListener(new TextWatcher() {
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -86,7 +87,8 @@ public class ChecklistActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
         if (checklist instanceof WorkingChecklist){
             fabCh.hide();
@@ -175,7 +177,7 @@ public class ChecklistActivity extends AppCompatActivity {
     public class ChecklistAdapter extends DragNDropArrayAdapter<ChecklistItem> {
         private final Context context;
         private final List<ChecklistItem> items;
-        private int selected = -1;
+        private boolean editingText = false;
 
         public ChecklistAdapter(Context context, List<ChecklistItem> items, int handler){
             super(context, -1, items, handler);
@@ -187,18 +189,31 @@ public class ChecklistActivity extends AppCompatActivity {
         public View getView(final int position, View convertView, ViewGroup parent){
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View rowView = inflater.inflate(R.layout.checklist_row, parent, false);
-            TextView textView;
+            final View rowView;
+            if (convertView != null){
+                rowView = convertView;
+            }
+            else{
+                rowView = inflater.inflate(R.layout.checklist_row, parent, false);
+            }
+            final TextView textView;
             final ChecklistItem item = items.get(position);
             //whether the checklist is working or master
             if (checklist instanceof WorkingChecklist){
+                //make textview visible
+                //make checkbox visible
+                //make edittext invisible
+                //make handle invisible
+                //make delete invisible
                 Log.d(TAG, "working checklist");
                 textView = (TextView)rowView.findViewById(R.id.itemText);
+                textView.setVisibility(View.VISIBLE);
                 rowView.findViewById(R.id.itemEdit).setVisibility(View.GONE);
                 //Put check box if entry
                 if (item instanceof WorkingChecklistEntry){
                     final WorkingChecklistEntry entry = (WorkingChecklistEntry)item;
-                    final CheckBox check = new CheckBox(context);
+                    final CheckBox check = (CheckBox)rowView.findViewById(R.id.checkBox);
+                    check.setVisibility(View.VISIBLE);
                     if (entry.isChecked()){
                         check.setChecked(true);
                         textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -206,12 +221,9 @@ public class ChecklistActivity extends AppCompatActivity {
                     check.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            ((View)v.getParent()).performClick();
+                            ((View) v.getParent()).performClick();
                         }
                     });
-                    ((ViewGroup) rowView).addView(check, 0,
-                            new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                    ViewGroup.LayoutParams.WRAP_CONTENT));
                     rowView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -234,13 +246,23 @@ public class ChecklistActivity extends AppCompatActivity {
                 rowView.findViewById(R.id.handle).setVisibility(View.GONE);
             }
             else if (checklist instanceof MasterChecklist){
+                //make textview invisible
+                //make checkbox invisible
+                //make edittext visible
+                //make handle visible
+                //make delete visible
                 Log.d(TAG, "master checklist");
                 textView = (EditText)rowView.findViewById(R.id.itemEdit);
+                textView.setVisibility(View.VISIBLE);
+                rowView.findViewById(R.id.checkBox).setVisibility(View.GONE);
+                rowView.findViewById(R.id.handle).setVisibility(View.VISIBLE);
+                rowView.findViewById(R.id.delete).setVisibility(View.VISIBLE);
                 rowView.findViewById(R.id.itemText).setVisibility(View.GONE);
                 ImageButton button = (ImageButton)rowView.findViewById(R.id.delete);
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Log.d(TAG, "delete button pressed");
                         items.remove(position);
                         ChecklistAdapter.this.notifyDataSetChanged();
                     }
@@ -254,48 +276,40 @@ public class ChecklistActivity extends AppCompatActivity {
                 textView.setTypeface(null, Typeface.BOLD);
                 textView.setPadding(10, 20, 0, 20);
             }
-            textView.setText(item.getText());
+            else{
+                textView.setTypeface(null, Typeface.NORMAL);
+                textView.setPadding(10, 10, 10, 10);
+            }
 
-            //Set listeners
-            textView.addTextChangedListener(new TextWatcher(){
+            TextWatcher watcher = new TextWatcher() {
 
                 @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    Log.d(TAG, "setting text of position " + position + " to " + s.toString());
-                    item.setText(s.toString());
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {}
-            });
-            textView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    if (hasFocus) {
-                        Log.d(TAG, "position " + position + " clicked");
-                        ChecklistAdapter.this.setSelected(position);
+                    if (!ChecklistAdapter.this.editingText) {
+                        Log.d(TAG, "setting text of position " + position + " to " + s.toString());
+                        item.setText(s.toString());
                     }
-                }
-            });
 
-            //If this one was previously selected, keep it in focus
-            if (position == this.selected){
-                Log.d(TAG, "requesting focus for position " + position);
-                textView.requestFocus();
-            }
-            else if (this.selected > items.size()){
-                this.selected = -1;
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
+            };
+
+            //Set listener if new textview
+            editingText = true;
+            textView.setText(item.getText());
+            editingText = false;
+            if (convertView == null) {
+                textView.addTextChangedListener(watcher);
             }
 
             return rowView;
-        }
-
-        public void setSelected(int selected){
-            this.selected = selected;
         }
 
     }
