@@ -94,6 +94,8 @@ public class ChecklistActivity extends AppCompatActivity {
             listView.setDivider(null);
             //Keep screen on
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            //Disable autofocus for title
+            findViewById(R.id.titleContainer).setFocusableInTouchMode(true);
         }
         else{
             setTitle("Edit Checklist");
