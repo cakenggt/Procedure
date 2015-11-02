@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -91,6 +92,8 @@ public class ChecklistActivity extends AppCompatActivity {
             ((TextView)findViewById(R.id.editTitle)).setVisibility(View.GONE);
             setTitle("Checklist");
             listView.setDivider(null);
+            //Keep screen on
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
         else{
             title = (EditText)findViewById(R.id.editTitle);
