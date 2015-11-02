@@ -16,16 +16,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/titleContainer">
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/textTitle"
-            android:layout_centerHorizontal="true"
-            android:textStyle="bold"
-            android:layout_alignParentTop="true"
-            android:gravity="center_horizontal" />
-
         <EditText
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

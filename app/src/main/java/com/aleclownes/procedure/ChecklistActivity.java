@@ -84,34 +84,30 @@ public class ChecklistActivity extends AppCompatActivity {
                 adapter.setSelected(checklist.getItems().size()-1);
             }
         });
-        TextView title;
+        TextView title = (TextView)findViewById(R.id.editTitle);
+        title.addTextChangedListener(new TextWatcher(){
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.d(TAG, "setting text of title to " + s.toString());
+                checklist.setTitle(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
         if (checklist instanceof WorkingChecklist){
             fabCh.hide();
             fabCi.hide();
-            title = (TextView)findViewById(R.id.textTitle);
-            ((TextView)findViewById(R.id.editTitle)).setVisibility(View.GONE);
             setTitle("Checklist");
             listView.setDivider(null);
             //Keep screen on
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
         else{
-            title = (EditText)findViewById(R.id.editTitle);
-            title.addTextChangedListener(new TextWatcher(){
-
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    Log.d(TAG, "setting text of title to " + s.toString());
-                    checklist.setTitle(s.toString());
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {}
-            });
-            ((TextView)findViewById(R.id.textTitle)).setVisibility(View.GONE);
             setTitle("Edit Checklist");
             listView.setOnItemDragNDropListener(new DragNDropListView.OnItemDragNDropListener() {
                 @Override
