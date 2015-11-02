@@ -145,6 +145,10 @@ public class MainActivity extends AppCompatActivity
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.checklist_list_context_menu, menu);
+        if (checklists.get(0) instanceof WorkingChecklist){
+            //Remove clone option for working checklists
+            menu.removeItem(R.id.clone);
+        }
     }
 
     @Override
@@ -159,9 +163,19 @@ public class MainActivity extends AppCompatActivity
                 checklists.remove(checklistIndex);
                 ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
                 return true;
-            case R.id.edit:
+            case R.id.clone:
+                Log.d(TAG, "on click, creating working checklist");
+                WorkingChecklist working;
+                if (checklist instanceof MasterChecklist){
+                    //Create a new working checklist
+                    working = new WorkingChecklist((MasterChecklist)checklist);
+                    checklistManager.create(working);
+                }
+                else{
+                    working = (WorkingChecklist)checklist;
+                }
                 Intent editIntent = new Intent(MainActivity.this, ChecklistActivity.class);
-                editIntent.putExtra(ChecklistActivity.ID_KEY, checklist.getId());
+                editIntent.putExtra(ChecklistActivity.ID_KEY, working.getId());
                 startActivity(editIntent);
             default:
                 return super.onContextItemSelected(item);
@@ -212,19 +226,8 @@ public class MainActivity extends AppCompatActivity
             rowView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d(TAG, "on click, creating working checklist");
-                    WorkingChecklist working;
-                    ChecklistManager checklistManager = new ChecklistManagerImpl(MainActivity.this);
-                    if (checklist instanceof MasterChecklist){
-                        //Create a new working checklist
-                        working = new WorkingChecklist((MasterChecklist)checklist);
-                        checklistManager.create(working);
-                    }
-                    else{
-                        working = (WorkingChecklist)checklist;
-                    }
                     Intent editIntent = new Intent(MainActivity.this, ChecklistActivity.class);
-                    editIntent.putExtra(ChecklistActivity.ID_KEY, working.getId());
+                    editIntent.putExtra(ChecklistActivity.ID_KEY, checklist.getId());
                     startActivity(editIntent);
                 }
             });
