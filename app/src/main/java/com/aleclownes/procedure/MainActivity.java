@@ -235,7 +235,7 @@ public class MainActivity extends AppCompatActivity
             Log.d(TAG, "getview");
             final Checklist checklist = checklists.get(position);
             TextView textView = (TextView)rowView.findViewById(R.id.checklistText);
-            textView.setText(Long.toString(checklist.getId()) + ": " + checklist.getTitle());
+            textView.setText(checklist.getTitle());
             rowView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
