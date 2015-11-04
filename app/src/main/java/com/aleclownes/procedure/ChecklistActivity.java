@@ -23,6 +23,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -235,7 +236,7 @@ public class ChecklistActivity extends AppCompatActivity {
                 textView = (EditText)rowView.findViewById(R.id.itemEdit);
                 rowView.findViewById(R.id.itemText).setVisibility(View.GONE);
                 rowView.findViewById(R.id.checkBox).setVisibility(View.GONE);
-                ImageButton button = (ImageButton)rowView.findViewById(R.id.delete);
+                ImageView button = (ImageView)rowView.findViewById(R.id.delete);
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
