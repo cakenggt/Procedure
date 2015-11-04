@@ -30,9 +30,6 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static String TAG = "MainActivity";
-    public final static String CHECKLIST_TYPE_KEY = "com.aleclownes.procedure.checklistType";
-    public final static String MASTER_CHECKLIST_KEY = "MASTER";
-    public final static String WORKING_CHECKLIST_KEY = "WORKING";
     List<Checklist> checklists = new ArrayList<>();
 
     @Override
@@ -149,6 +146,7 @@ public class MainActivity extends AppCompatActivity
                 checklistManager.create(working);
                 Intent editIntent = new Intent(MainActivity.this, ChecklistActivity.class);
                 editIntent.putExtra(ChecklistActivity.ID_KEY, working.getId());
+                editIntent.putExtra(ChecklistActivity.CHECKLIST_TYPE_KEY, ChecklistActivity.EDIT_MODE);
                 startActivity(editIntent);
             default:
                 return super.onContextItemSelected(item);

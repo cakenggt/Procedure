@@ -30,6 +30,9 @@ public class ChecklistActivity extends AppCompatActivity {
 
     private static final String TAG = "ChecklistActivity";
     public static final String ID_KEY = "com.aleclownes.procedure.id";
+    public final static String CHECKLIST_TYPE_KEY = "com.aleclownes.procedure.mode";
+    public static final String EDIT_MODE = "EDIT";
+    public static final String CHECK_MODE = "CHECK";
     Checklist checklist;
     ChecklistMode mode;
     Menu menu;
@@ -45,10 +48,22 @@ public class ChecklistActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null && intent.getLongExtra(ID_KEY, 0) != 0){
             checklist = checklistManager.read(intent.getLongExtra(ID_KEY, 0));
+            if (intent.getStringExtra(CHECKLIST_TYPE_KEY) != null){
+                if (intent.getStringExtra(CHECKLIST_TYPE_KEY).equals(EDIT_MODE)){
+                    switchToEditMode();
+                }
+                else{
+                    switchToCheckMode();
+                }
+            }
+            else {
+                switchToCheckMode();
+            }
         }
         else{
             checklist = new Checklist();
             checklistManager.create(checklist);
+            switchToEditMode();
         }
         //Add adapter
         final ChecklistAdapter adapter = new ChecklistAdapter(this, checklist.getItems(), R.id.handle);
@@ -81,7 +96,7 @@ public class ChecklistActivity extends AppCompatActivity {
             }
         });
         //Clear items
-        FloatingActionButton fabClear = (FloatingActionButton) findViewById(R.id.fab_clear);
+        final FloatingActionButton fabClear = (FloatingActionButton) findViewById(R.id.fab_clear);
         fabClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,14 +106,16 @@ public class ChecklistActivity extends AppCompatActivity {
                     }
                 }
                 adapter.notifyDataSetChanged();
+                fabClear.hide();
             }
         });
         TextView title = (TextView)findViewById(R.id.editTitle);
         TextView textTitle = (TextView)findViewById(R.id.textTitle);
-        title.addTextChangedListener(new TextWatcher(){
+        title.addTextChangedListener(new TextWatcher() {
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -107,9 +124,9 @@ public class ChecklistActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
-        switchToCheckMode();
         title.setText(checklist.getTitle());
         textTitle.setText(checklist.getTitle());
         if (getSupportActionBar() != null) {
@@ -215,6 +232,21 @@ public class ChecklistActivity extends AppCompatActivity {
                             } else {
                                 //Remove strikethrough
                                 buttonView.setPaintFlags(buttonView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                            }
+                            //show the clear button if there are any checked entries
+                            FloatingActionButton fabClear = (FloatingActionButton) findViewById(R.id.fab_clear);
+                            boolean show = false;
+                            for (ChecklistItem item : checklist.getItems()){
+                                if (item instanceof ChecklistEntry){
+                                    if (((ChecklistEntry)item).isChecked()){
+                                        fabClear.show();
+                                        show = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!show){
+                                fabClear.hide();
                             }
                         }
                     });
@@ -348,7 +380,19 @@ public class ChecklistActivity extends AppCompatActivity {
         DragNDropListView listView = (DragNDropListView) findViewById(R.id.checklistListView);
         fabCh.hide();
         fabCi.hide();
-        fabClear.show();
+        boolean show = false;
+        for (ChecklistItem item : checklist.getItems()){
+            if (item instanceof ChecklistEntry){
+                if (((ChecklistEntry)item).isChecked()){
+                    fabClear.show();
+                    show = true;
+                    break;
+                }
+            }
+        }
+        if (!show){
+            fabClear.hide();
+        }
         setTitle("Checklist");
         listView.setDivider(null);
         //Keep screen on
