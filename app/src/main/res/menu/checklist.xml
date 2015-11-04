@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/switch_mode"
-        android:icon="@drawable/ic_create_black_24dp"
+        android:icon="@drawable/ic_mode_edit_white_24dp"
         android:title="@string/edit_mode"
         app:showAsAction="ifRoom"/>
 

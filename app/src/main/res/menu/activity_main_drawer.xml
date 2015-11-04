@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
-        <item android:id="@+id/master" android:icon="@android:drawable/ic_menu_camera"
-            android:title="Master" />
-        <item android:id="@+id/working" android:icon="@android:drawable/ic_menu_gallery"
-            android:title="Working" />
-    </group>
-
     <item android:title="Communicate">
         <menu>
             <item android:id="@+id/nav_share" android:icon="@android:drawable/ic_menu_share"

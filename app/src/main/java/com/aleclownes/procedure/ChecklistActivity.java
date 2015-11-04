@@ -137,10 +137,10 @@ public class ChecklistActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.checklist, menu);
         this.menu = menu;
         if (mode == ChecklistMode.CHECK){
-            menu.getItem(0).setIcon(R.drawable.ic_create_black_24dp);
+            menu.getItem(0).setIcon(R.drawable.ic_mode_edit_white_24dp);
         }
         else if (mode == ChecklistMode.EDIT){
-            menu.getItem(0).setIcon(R.drawable.ic_list_black_24dp);
+            menu.getItem(0).setIcon(R.drawable.ic_list_white_24dp);
         }
         return true;
     }
@@ -331,7 +331,7 @@ public class ChecklistActivity extends AppCompatActivity {
             }
         });
         if (menu != null) {
-            menu.getItem(0).setIcon(R.drawable.ic_list_black_24dp);
+            menu.getItem(0).setIcon(R.drawable.ic_list_white_24dp);
             menu.getItem(0).setTitle(R.string.check_mode);
         }
     }
@@ -355,7 +355,7 @@ public class ChecklistActivity extends AppCompatActivity {
         //Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if (menu != null) {
-            menu.getItem(0).setIcon(R.drawable.ic_create_black_24dp);
+            menu.getItem(0).setIcon(R.drawable.ic_mode_edit_white_24dp);
             menu.getItem(0).setTitle(R.string.edit_mode);
         }
     }

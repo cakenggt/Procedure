@@ -71,7 +71,6 @@ public class MainActivity extends AppCompatActivity
             checklists.add(check);
         }
         ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
-        setTitle("Master Checklists");
     }
 
     @Override
