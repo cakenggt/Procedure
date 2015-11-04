@@ -63,34 +63,15 @@ public class MainActivity extends AppCompatActivity
         final ListView listView = (ListView) findViewById(R.id.checklistListListView);
         final ChecklistListAdapter adapter = new ChecklistListAdapter(this, checklists);
         listView.setAdapter(adapter);
-        listView.setDivider(null);
         registerForContextMenu(listView);
         Log.d(TAG, "Added adapter");
 
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
-        Intent intent = getIntent();
-        if (intent != null && intent.getStringExtra(CHECKLIST_TYPE_KEY) != null){
-            switch (intent.getStringExtra(CHECKLIST_TYPE_KEY)){
-                case MASTER_CHECKLIST_KEY:
-                    switchToMasterMode();
-                    break;
-                case WORKING_CHECKLIST_KEY:
-                    switchToWorkingMode();
-                    break;
-                default:
-                    switchToMasterMode();
-                    break;
-            }
+        for (Checklist check : checklistManager.getAllChecklists()){
+            checklists.add(check);
         }
-        else{
-            if (checklistManager.getAllWorkingChecklists().size() > 0){
-                //If there are any working checklists, switch to working mode
-                switchToWorkingMode();
-            }
-            else{
-                switchToMasterMode();
-            }
-        }
+        ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
+        setTitle("Master Checklists");
     }
 
     @Override
@@ -132,9 +113,9 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.master) {
-            switchToMasterMode();
+
         } else if (id == R.id.working) {
-            switchToWorkingMode();
+
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
@@ -188,34 +169,6 @@ public class MainActivity extends AppCompatActivity
             default:
                 return super.onContextItemSelected(item);
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void switchToWorkingMode(){
-        ChecklistManager checklistManager = new ChecklistManagerImpl(this);
-        ((FloatingActionButton)findViewById(R.id.fab)).hide();
-        checklists.clear();
-        for (Checklist check : checklistManager.getAllWorkingChecklists()){
-            checklists.add(check);
-        }
-        ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
-        setTitle("Working Checklists");
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.getMenu().getItem(1).setChecked(true);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void switchToMasterMode(){
-        ChecklistManager checklistManager = new ChecklistManagerImpl(this);
-        ((FloatingActionButton)findViewById(R.id.fab)).show();
-        checklists.clear();
-        for (Checklist check : checklistManager.getAllMasterChecklists()){
-            checklists.add(check);
-        }
-        ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
-        setTitle("Master Checklists");
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.getMenu().getItem(0).setChecked(true);
     }
 
     public class ChecklistListAdapter extends ArrayAdapter<Checklist> {

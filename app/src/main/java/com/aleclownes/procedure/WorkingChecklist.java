@@ -8,6 +8,10 @@ import java.util.ArrayList;
  */
 public class WorkingChecklist extends Checklist implements Serializable {
 
+    public WorkingChecklist(){
+        super();
+    }
+
     public WorkingChecklist(MasterChecklist master){
         super.items = new ArrayList<ChecklistItem>();
         for (ChecklistItem item : master.items){

@@ -14,6 +14,10 @@ public class WorkingChecklistEntry extends ChecklistEntry implements Serializabl
         this.checked = false;
     }
 
+    public WorkingChecklistEntry(){
+        super();
+    }
+
     public boolean isChecked() {
         return checked;
     }

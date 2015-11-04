@@ -8,7 +8,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/checklistText"
-        android:background="@drawable/rounded_corner"
         android:padding="10dp"
         android:layout_margin="5dp" />
 
