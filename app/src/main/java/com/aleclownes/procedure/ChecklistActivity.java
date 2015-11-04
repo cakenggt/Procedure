@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -43,7 +44,7 @@ public class ChecklistActivity extends AppCompatActivity {
         setContentView(R.layout.activity_checklist);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final DragNDropListView listView = (DragNDropListView) findViewById(R.id.checklistListView);
+        final RecyclerView listView = (RecyclerView) findViewById(R.id.checklistListView);
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
         Intent intent = getIntent();
         if (intent != null && intent.getLongExtra(ID_KEY, 0) != 0){
@@ -67,7 +68,7 @@ public class ChecklistActivity extends AppCompatActivity {
         }
         //Add adapter
         final ChecklistAdapter adapter = new ChecklistAdapter(this, checklist.getItems(), R.id.handle);
-        listView.setDragNDropAdapter(adapter);
+        listView.setAdapter(adapter);
         Log.d(TAG, "Added adapter");
         //Add a new checklist header
         FloatingActionButton fabCh = (FloatingActionButton) findViewById(R.id.fab_ch);
@@ -79,7 +80,7 @@ public class ChecklistActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
                 int newChildIndex = checklist.getItems().size()-1;
                 adapter.setSelected(newChildIndex);
-                listView.setSelection(newChildIndex);
+                listView.getChildAt(newChildIndex).setSelected(true);
             }
         });
         //Add a new checklist item
@@ -92,7 +93,7 @@ public class ChecklistActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
                 int newChildIndex = checklist.getItems().size() - 1;
                 adapter.setSelected(newChildIndex);
-                listView.setSelection(newChildIndex);
+                listView.getChildAt(newChildIndex).setSelected(true);
             }
         });
         //Clear items
@@ -190,15 +191,17 @@ public class ChecklistActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public class ChecklistAdapter extends DragNDropArrayAdapter<ChecklistItem> {
+    public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.ChecklistViewHolder>{
         private final Context context;
         private final List<ChecklistItem> items;
         private int selected = -1;
+        private int handler;
 
         public ChecklistAdapter(Context context, List<ChecklistItem> items, int handler){
-            super(context, -1, items, handler);
+            super();
             this.context = context;
             this.items = items;
+            this.handler = handler;
         }
 
         @Override
@@ -236,16 +239,16 @@ public class ChecklistActivity extends AppCompatActivity {
                             //show the clear button if there are any checked entries
                             FloatingActionButton fabClear = (FloatingActionButton) findViewById(R.id.fab_clear);
                             boolean show = false;
-                            for (ChecklistItem item : checklist.getItems()){
-                                if (item instanceof ChecklistEntry){
-                                    if (((ChecklistEntry)item).isChecked()){
+                            for (ChecklistItem item : checklist.getItems()) {
+                                if (item instanceof ChecklistEntry) {
+                                    if (((ChecklistEntry) item).isChecked()) {
                                         fabClear.show();
                                         show = true;
                                         break;
                                     }
                                 }
                             }
-                            if (!show){
+                            if (!show) {
                                 fabClear.hide();
                             }
                         }
@@ -327,6 +330,38 @@ public class ChecklistActivity extends AppCompatActivity {
             this.selected = selected;
         }
 
+        @Override
+        public ChecklistAdapter.ChecklistViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return null;
+        }
+
+        @Override
+        public void onBindViewHolder(ChecklistViewHolder holder, int position) {
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return items.size();
+        }
+
+        public class ChecklistViewHolder extends RecyclerView.ViewHolder {
+
+            public final CheckBox checkBox;
+            public final ImageView handle;
+            public final TextView itemText;
+            public final EditText itemEdit;
+            public final ImageView delete;
+
+            public ChecklistViewHolder(View itemView) {
+                super(itemView);
+                checkBox = (CheckBox)itemView.findViewById(R.id.checkBox);
+                handle = (ImageView)itemView.findViewById(R.id.handle);
+                itemText = (TextView)itemView.findViewById(R.id.itemText);
+                itemEdit = (EditText)itemView.findViewById(R.id.itemEdit);
+                delete = (ImageView)itemView.findViewById(R.id.delete);
+            }
+        }
     }
 
     private void switchToEditMode(){
