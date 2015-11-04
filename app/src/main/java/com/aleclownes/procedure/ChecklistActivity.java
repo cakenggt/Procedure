@@ -18,11 +18,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Adapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -49,7 +47,7 @@ public class ChecklistActivity extends AppCompatActivity {
             checklist = checklistManager.read(intent.getLongExtra(ID_KEY, 0));
         }
         else{
-            checklist = new WorkingChecklist();
+            checklist = new Checklist();
             checklistManager.create(checklist);
         }
         //Add adapter
@@ -74,7 +72,7 @@ public class ChecklistActivity extends AppCompatActivity {
         fabCi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ChecklistActivity.this.checklist.getItems().add(new WorkingChecklistEntry());
+                ChecklistActivity.this.checklist.getItems().add(new ChecklistEntry());
                 Log.d(TAG, "Item add button clicked");
                 adapter.notifyDataSetChanged();
                 int newChildIndex = checklist.getItems().size() - 1;
@@ -88,8 +86,8 @@ public class ChecklistActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 for (ChecklistItem item : ChecklistActivity.this.checklist.getItems()){
-                    if (item instanceof WorkingChecklistEntry){
-                        ((WorkingChecklistEntry)item).setChecked(false);
+                    if (item instanceof ChecklistEntry){
+                        ((ChecklistEntry)item).setChecked(false);
                     }
                 }
                 adapter.notifyDataSetChanged();
@@ -198,8 +196,8 @@ public class ChecklistActivity extends AppCompatActivity {
                 Log.d(TAG, "working checklist");
                 rowView.findViewById(R.id.itemEdit).setVisibility(View.GONE);
                 //Put check box if entry
-                if (item instanceof WorkingChecklistEntry){
-                    final WorkingChecklistEntry entry = (WorkingChecklistEntry)item;
+                if (item instanceof ChecklistEntry){
+                    final ChecklistEntry entry = (ChecklistEntry)item;
                     rowView.findViewById(R.id.itemText).setVisibility(View.GONE);
                     final CheckBox check = (CheckBox)rowView.findViewById(R.id.checkBox);
                     textView = check;

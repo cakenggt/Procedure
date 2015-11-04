@@ -2,7 +2,6 @@ package com.aleclownes.procedure;
 
 import android.content.Context;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -95,30 +94,6 @@ public class ChecklistManagerImpl implements ChecklistManager {
             checklists = new ArrayList<Checklist>();
         }
         return checklists;
-    }
-
-    @Override
-    public List<MasterChecklist> getAllMasterChecklists() {
-        List<Checklist> all = getAllChecklists();
-        List<MasterChecklist> master = new ArrayList<MasterChecklist>();
-        for (Checklist checklist : all){
-            if (checklist instanceof MasterChecklist){
-                master.add((MasterChecklist)checklist);
-            }
-        }
-        return master;
-    }
-
-    @Override
-    public List<WorkingChecklist> getAllWorkingChecklists() {
-        List<Checklist> all = getAllChecklists();
-        List<WorkingChecklist> working = new ArrayList<WorkingChecklist>();
-        for (Checklist checklist : all){
-            if (checklist instanceof WorkingChecklist){
-                working.add((WorkingChecklist)checklist);
-            }
-        }
-        return working;
     }
 
     private void saveAllChecklists(List<Checklist> checklists){
