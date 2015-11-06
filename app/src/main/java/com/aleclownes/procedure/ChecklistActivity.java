@@ -169,9 +169,6 @@ public class ChecklistActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.action_settings:
-                //noinspection SimplifiableIfStatement
-                return true;
             case android.R.id.home:
                 Intent listIntent = new Intent(this, MainActivity.class);
                 listIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
