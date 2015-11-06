@@ -5,6 +5,7 @@
     <item
         android:id="@+id/switch_mode"
         android:title="@string/edit_mode"
+        android:icon="@drawable/ic_mode_edit_white_24dp"
         app:showAsAction="ifRoom"/>
 
 </menu>

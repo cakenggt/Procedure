@@ -72,6 +72,7 @@ public class ChecklistActivity extends AppCompatActivity {
             listView.setDragNDropAdapter(adapter);
             switchToEditMode();
         }
+        setTitle(checklist.getTitle());
         Log.d(TAG, "Added adapter");
         //Add a new checklist header
         FloatingActionButton fabCh = (FloatingActionButton) findViewById(R.id.fab_ch);
@@ -104,35 +105,15 @@ public class ChecklistActivity extends AppCompatActivity {
         fabClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for (ChecklistItem item : ChecklistActivity.this.checklist.getItems()){
-                    if (item instanceof ChecklistEntry){
-                        ((ChecklistEntry)item).setChecked(false);
+                for (ChecklistItem item : ChecklistActivity.this.checklist.getItems()) {
+                    if (item instanceof ChecklistEntry) {
+                        ((ChecklistEntry) item).setChecked(false);
                     }
                 }
                 adapter.notifyDataSetChanged();
                 fabClear.hide();
             }
         });
-        TextView title = (TextView)findViewById(R.id.editTitle);
-        TextView textTitle = (TextView)findViewById(R.id.textTitle);
-        title.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d(TAG, "setting text of title to " + s.toString());
-                checklist.setTitle(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
-        title.setText(checklist.getTitle());
-        textTitle.setText(checklist.getTitle());
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
@@ -158,9 +139,11 @@ public class ChecklistActivity extends AppCompatActivity {
         this.menu = menu;
         if (mode == ChecklistMode.CHECK){
             menu.getItem(0).setTitle(R.string.edit_mode);
+            menu.getItem(0).setIcon(R.drawable.ic_mode_edit_white_24dp);
         }
         else if (mode == ChecklistMode.EDIT){
             menu.getItem(0).setTitle(R.string.check_mode);
+            menu.getItem(0).setIcon(null);
         }
         return true;
     }
@@ -206,7 +189,8 @@ public class ChecklistActivity extends AppCompatActivity {
         public View getView(final int position, View convertView, ViewGroup parent){
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View rowView = inflater.inflate(R.layout.checklist_row, parent, false);
+            View colView = inflater.inflate(R.layout.checklist_row, parent, false);
+            final View rowView = colView.findViewById(R.id.rowLayout);
             TextView textView;
             final ChecklistItem item = items.get(position);
             //whether the checklist is working or master
@@ -251,6 +235,7 @@ public class ChecklistActivity extends AppCompatActivity {
                             }
                         }
                     });
+                    colView.findViewById(R.id.divider).setVisibility(View.GONE);
                 }
                 else{
                     //Is a header
@@ -282,7 +267,14 @@ public class ChecklistActivity extends AppCompatActivity {
             }
             if (item instanceof ChecklistHeader){
                 textView.setTypeface(null, Typeface.BOLD);
-                textView.setPadding(10, 20, 0, 20);
+                if (position != 0) {
+                    colView.findViewById(R.id.divider).setVisibility(View.VISIBLE);
+                } else {
+                    colView.findViewById(R.id.divider).setVisibility(View.GONE);
+                }
+            }
+            else {
+                colView.findViewById(R.id.divider).setVisibility(View.GONE);
             }
             textView.setText(item.getText());
 
@@ -321,7 +313,7 @@ public class ChecklistActivity extends AppCompatActivity {
                 this.selected = -1;
             }
 
-            return rowView;
+            return colView;
         }
 
         public void setSelected(int selected){
@@ -331,12 +323,7 @@ public class ChecklistActivity extends AppCompatActivity {
     }
 
     private void switchToEditMode(){
-        setTitle("Edit Checklist");
         mode = ChecklistMode.EDIT;
-        EditText editTitle = (EditText)findViewById(R.id.editTitle);
-        TextView textTitle = (TextView)findViewById(R.id.textTitle);
-        editTitle.setVisibility(View.VISIBLE);
-        textTitle.setVisibility(View.GONE);
         DragNDropListView listView = (DragNDropListView) findViewById(R.id.checklistListView);
         FloatingActionButton fabCh = (FloatingActionButton) findViewById(R.id.fab_ch);
         FloatingActionButton fabCi = (FloatingActionButton) findViewById(R.id.fab_ci);
@@ -364,16 +351,13 @@ public class ChecklistActivity extends AppCompatActivity {
         });
         if (menu != null) {
             menu.getItem(0).setTitle(R.string.check_mode);
+            menu.getItem(0).setIcon(null);
         }
+        ((ChecklistAdapter)listView.getAdapter()).notifyDataSetChanged();
     }
 
     private void switchToCheckMode(){
         mode = ChecklistMode.CHECK;
-        EditText editTitle = (EditText)findViewById(R.id.editTitle);
-        TextView textTitle = (TextView)findViewById(R.id.textTitle);
-        textTitle.setText(checklist.getTitle());
-        textTitle.setVisibility(View.VISIBLE);
-        editTitle.setVisibility(View.GONE);
         FloatingActionButton fabCh = (FloatingActionButton) findViewById(R.id.fab_ch);
         FloatingActionButton fabCi = (FloatingActionButton) findViewById(R.id.fab_ci);
         FloatingActionButton fabClear = (FloatingActionButton) findViewById(R.id.fab_clear);
@@ -393,13 +377,13 @@ public class ChecklistActivity extends AppCompatActivity {
         if (!show){
             fabClear.hide();
         }
-        setTitle("Checklist");
         listView.setDivider(null);
         //Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if (menu != null) {
-            menu.getItem(0).setTitle(R.string.edit_mode);
+            menu.getItem(0).setIcon(R.drawable.ic_mode_edit_white_24dp);
         }
+        ((ChecklistAdapter)listView.getAdapter()).notifyDataSetChanged();
     }
 
 }

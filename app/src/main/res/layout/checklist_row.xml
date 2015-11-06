@@ -1,45 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:id="@+id/rowLayout"
-    android:orientation="horizontal">
+    android:id="@+id/colLayout"
+    android:orientation="vertical">
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/checkBox"
-        android:layout_weight="1" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:id="@+id/divider"
+        android:background="@android:color/darker_gray"
+        android:layout_marginTop="@dimen/checklist_row_vertical_padding"/>
 
-    <ImageView
-        android:layout_height="24dp"
-        android:id="@+id/handle"
-        android:src="@drawable/ic_reorder_black_24dp"
-        android:layout_width="wrap_content"
-        android:adjustViewBounds="true"
-        android:paddingRight="5dp"
-        android:paddingLeft="5dp"
-        android:layout_gravity="center_vertical" />
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:id="@+id/rowLayout"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/checklist_row_vertical_padding">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/itemText"
-        android:textSize="15dp" />
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/checkBox"
+            android:layout_weight="1"
+            android:layout_gravity="left"
+            android:layout_marginLeft="-7dp" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/itemEdit"
-        android:hint="@string/default_item_hint"
-        android:textSize="15dp"
-        android:layout_weight="1" />
+        <ImageView
+            android:layout_height="24dp"
+            android:id="@+id/handle"
+            android:src="@drawable/ic_reorder_black_24dp"
+            android:layout_width="wrap_content"
+            android:adjustViewBounds="true"
+            android:paddingRight="5dp"
+            android:paddingLeft="5dp"
+            android:layout_gravity="center_vertical" />
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="24dp"
-        android:id="@+id/delete"
-        android:src="@drawable/ic_clear_black_24dp"
-        android:adjustViewBounds="true"
-        android:layout_gravity="center_vertical" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/itemText"
+            android:textSize="15dp"
+            android:layout_gravity="center_vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp" />
 
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/itemEdit"
+            android:hint="@string/default_item_hint"
+            android:textSize="15dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:id="@+id/delete"
+            android:src="@drawable/ic_delete_black_24dp"
+            android:adjustViewBounds="true"
+            android:layout_gravity="center_vertical" />
+
+    </LinearLayout>
 </LinearLayout>

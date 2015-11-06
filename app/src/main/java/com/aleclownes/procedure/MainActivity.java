@@ -150,6 +150,15 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
             });
+            //Setting text in circle icon
+            TextView circleIcon = (TextView)rowView.findViewById(R.id.circle_icon);
+            int contents = 0;
+            for (ChecklistItem item : checklist.getItems()){
+                if (item instanceof ChecklistEntry){
+                    contents++;
+                }
+            }
+            circleIcon.setText(Integer.toString(contents));
             return rowView;
         }
 
