@@ -266,7 +266,7 @@ public class ChecklistActivity extends AppCompatActivity {
                 textView = (TextView)rowView.findViewById(R.id.itemText);
             }
             if (item instanceof ChecklistHeader){
-                textView.setTypeface(null, Typeface.BOLD);
+                textView.setTextColor(getResources().getColor(R.color.gray1));
                 if (position != 0) {
                     colView.findViewById(R.id.divider).setVisibility(View.VISIBLE);
                 } else {
