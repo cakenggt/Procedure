@@ -96,7 +96,7 @@ public class ChecklistManagerImpl implements ChecklistManager {
         return checklists;
     }
 
-    private void saveAllChecklists(List<Checklist> checklists){
+    public void saveAllChecklists(List<Checklist> checklists){
         writeObjectToMemory(CHECKLIST_LIST_FILENAME, checklists);
     }
 

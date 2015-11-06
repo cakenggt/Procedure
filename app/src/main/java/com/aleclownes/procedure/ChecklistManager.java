@@ -24,4 +24,6 @@ public interface ChecklistManager {
     @NonNull
     public List<Checklist> getAllChecklists();
 
+    public void saveAllChecklists(List<Checklist> checklists);
+
 }
