@@ -45,9 +45,13 @@ public class ChecklistActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         final DragNDropListView listView = (DragNDropListView) findViewById(R.id.checklistListView);
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
+        final ChecklistAdapter adapter;
         Intent intent = getIntent();
         if (intent != null && intent.getLongExtra(ID_KEY, 0) != 0){
             checklist = checklistManager.read(intent.getLongExtra(ID_KEY, 0));
+            //Add adapter
+            adapter = new ChecklistAdapter(this, checklist.getItems(), R.id.handle);
+            listView.setDragNDropAdapter(adapter);
             if (intent.getStringExtra(CHECKLIST_TYPE_KEY) != null){
                 if (intent.getStringExtra(CHECKLIST_TYPE_KEY).equals(EDIT_MODE)){
                     switchToEditMode();
@@ -63,11 +67,11 @@ public class ChecklistActivity extends AppCompatActivity {
         else{
             checklist = new Checklist();
             checklistManager.create(checklist);
+            //Add adapter
+            adapter = new ChecklistAdapter(this, checklist.getItems(), R.id.handle);
+            listView.setDragNDropAdapter(adapter);
             switchToEditMode();
         }
-        //Add adapter
-        final ChecklistAdapter adapter = new ChecklistAdapter(this, checklist.getItems(), R.id.handle);
-        listView.setDragNDropAdapter(adapter);
         Log.d(TAG, "Added adapter");
         //Add a new checklist header
         FloatingActionButton fabCh = (FloatingActionButton) findViewById(R.id.fab_ch);
@@ -153,10 +157,10 @@ public class ChecklistActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.checklist, menu);
         this.menu = menu;
         if (mode == ChecklistMode.CHECK){
-            menu.getItem(0).setIcon(R.drawable.ic_mode_edit_white_24dp);
+            menu.getItem(0).setTitle(R.string.edit_mode);
         }
         else if (mode == ChecklistMode.EDIT){
-            menu.getItem(0).setIcon(R.drawable.ic_list_white_24dp);
+            menu.getItem(0).setTitle(R.string.check_mode);
         }
         return true;
     }
@@ -359,7 +363,6 @@ public class ChecklistActivity extends AppCompatActivity {
             }
         });
         if (menu != null) {
-            menu.getItem(0).setIcon(R.drawable.ic_list_white_24dp);
             menu.getItem(0).setTitle(R.string.check_mode);
         }
     }
@@ -395,7 +398,6 @@ public class ChecklistActivity extends AppCompatActivity {
         //Keep screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if (menu != null) {
-            menu.getItem(0).setIcon(R.drawable.ic_mode_edit_white_24dp);
             menu.getItem(0).setTitle(R.string.edit_mode);
         }
     }

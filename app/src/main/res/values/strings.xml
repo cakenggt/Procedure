@@ -10,6 +10,6 @@
     <string name="default_item_hint">Enter text here...</string>
     <string name="checklist_title_hint">Title...</string>
 
-    <string name="edit_mode">Edit</string>
-    <string name="check_mode">Check</string>
+    <string name="edit_mode">EDIT</string>
+    <string name="check_mode">DONE</string>
 </resources>
