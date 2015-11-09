@@ -9,13 +9,13 @@
         android:layout_height="1dp"
         android:id="@+id/divider"
         android:background="@android:color/darker_gray"
-        android:layout_marginTop="@dimen/checklist_row_vertical_padding"/>
+        android:layout_marginTop="@dimen/checklist_row_vertical_padding" />
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:id="@+id/rowLayout"
         android:orientation="horizontal"
-        android:paddingTop="@dimen/checklist_row_vertical_padding">
+        android:layout_marginTop="@dimen/checklist_row_vertical_padding">
 
         <CheckBox
             android:layout_width="wrap_content"
@@ -24,8 +24,7 @@
             android:layout_weight="1"
             android:layout_gravity="left"
             android:layout_marginLeft="-7dp"
-            android:paddingLeft="@dimen/checkbox_padding"
-            android:textStyle="bold" />
+            android:paddingLeft="@dimen/checkbox_padding" />
 
         <ImageView
             android:layout_height="24dp"
@@ -41,11 +40,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/itemText"
-            android:layout_gravity="center_vertical"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:textStyle="bold"
-            android:textColor="@color/gray1" />
+            android:layout_marginBottom="10dp"
+            android:textColor="@color/gray1"
+            android:layout_gravity="center_vertical" />
 
         <EditText
             android:layout_width="wrap_content"
@@ -54,7 +51,6 @@
             android:hint="@string/default_item_hint"
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
-            android:textStyle="bold"
             android:inputType="textCapSentences" />
 
         <ImageView
