@@ -24,6 +24,7 @@
             android:layout_weight="1"
             android:layout_gravity="left"
             android:layout_marginLeft="-7dp"
+            android:paddingLeft="@dimen/checkbox_padding"
             android:textStyle="bold" />
 
         <ImageView
@@ -40,7 +41,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/itemText"
-            android:textSize="15dp"
             android:layout_gravity="center_vertical"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
@@ -52,7 +52,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/itemEdit"
             android:hint="@string/default_item_hint"
-            android:textSize="15dp"
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:textStyle="bold"
