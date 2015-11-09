@@ -2,31 +2,20 @@ package com.aleclownes.procedure;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -40,13 +29,19 @@ public class MainActivity extends AppCompatActivity {
     private static String TAG = "MainActivity";
     List<Checklist> checklists = new ArrayList<>();
     private ChecklistMode mode;
+    public static String MODE_KEY = "MODE";
     Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mode = ChecklistMode.CHECK;
+        if (savedInstanceState != null){
+            mode = ChecklistMode.valueOf(savedInstanceState.getCharSequence(MODE_KEY).toString());
+        }
+        else {
+            mode = ChecklistMode.CHECK;
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -70,6 +65,13 @@ public class MainActivity extends AppCompatActivity {
             checklists.add(check);
         }
         ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onSaveInstanceState (Bundle outState) {
+        //When orientation changes
+        super.onSaveInstanceState(outState);
+        outState.putCharSequence(MODE_KEY, mode.toString());
     }
 
     @Override

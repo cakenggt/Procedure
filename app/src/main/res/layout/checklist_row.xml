@@ -64,7 +64,8 @@
             android:id="@+id/delete"
             android:src="@drawable/ic_delete_black_24dp"
             android:adjustViewBounds="true"
-            android:layout_gravity="center_vertical" />
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/activity_horizontal_margin" />
 
     </LinearLayout>
 </LinearLayout>

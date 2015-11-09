@@ -64,6 +64,13 @@ public class ChecklistActivity extends AppCompatActivity {
                 switchToCheckMode();
             }
         }
+        else if (savedInstanceState != null){
+            //Saved a checklist id from a new checklist
+            checklist = checklistManager.read(savedInstanceState.getLong(ChecklistActivity.ID_KEY));
+            adapter = new ChecklistAdapter(this, checklist.getItems(), R.id.handle);
+            listView.setDragNDropAdapter(adapter);
+            switchToEditMode();
+        }
         else{
             checklist = new Checklist();
             checklistManager.create(checklist);
@@ -71,6 +78,15 @@ public class ChecklistActivity extends AppCompatActivity {
             adapter = new ChecklistAdapter(this, checklist.getItems(), R.id.handle);
             listView.setDragNDropAdapter(adapter);
             switchToEditMode();
+        }
+        if (savedInstanceState != null){
+            mode = ChecklistMode.valueOf(savedInstanceState.getCharSequence(MainActivity.MODE_KEY).toString());
+            if (ChecklistMode.CHECK.equals(mode)){
+                switchToCheckMode();
+            }
+            else{
+                switchToEditMode();
+            }
         }
         setTitle(checklist.getTitle());
         Log.d(TAG, "Added adapter");
@@ -117,6 +133,14 @@ public class ChecklistActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState (Bundle outState) {
+        //When orientation changes
+        super.onSaveInstanceState(outState);
+        outState.putCharSequence(MainActivity.MODE_KEY, mode.toString());
+        outState.putLong(ChecklistActivity.ID_KEY, checklist.getId());
     }
 
     @Override
