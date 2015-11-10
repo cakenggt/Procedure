@@ -1,5 +1,6 @@
 package com.aleclownes.procedure;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
@@ -18,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -29,10 +31,6 @@ import java.util.List;
 public class ChecklistActivity extends AppCompatActivity {
 
     private static final String TAG = "ChecklistActivity";
-    public static final String ID_KEY = "com.aleclownes.procedure.id";
-    public final static String CHECKLIST_TYPE_KEY = "com.aleclownes.procedure.mode";
-    public static final String EDIT_MODE = "EDIT";
-    public static final String CHECK_MODE = "CHECK";
     Checklist checklist;
     ChecklistMode mode;
     Menu menu;
@@ -47,13 +45,13 @@ public class ChecklistActivity extends AppCompatActivity {
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
         final ChecklistAdapter adapter;
         Intent intent = getIntent();
-        if (intent != null && intent.getLongExtra(ID_KEY, 0) != 0){
-            checklist = checklistManager.read(intent.getLongExtra(ID_KEY, 0));
+        if (intent != null && intent.getLongExtra(ChecklistUtility.ID_KEY, 0) != 0){
+            checklist = checklistManager.read(intent.getLongExtra(ChecklistUtility.ID_KEY, 0));
             //Add adapter
             adapter = new ChecklistAdapter(this, checklist.getItems(), R.id.handle);
             listView.setDragNDropAdapter(adapter);
-            if (intent.getStringExtra(CHECKLIST_TYPE_KEY) != null){
-                if (intent.getStringExtra(CHECKLIST_TYPE_KEY).equals(EDIT_MODE)){
+            if (intent.getStringExtra(ChecklistUtility.CHECKLIST_TYPE_KEY) != null){
+                if (intent.getStringExtra(ChecklistUtility.CHECKLIST_TYPE_KEY).equals(ChecklistUtility.EDIT_MODE)){
                     switchToEditMode();
                 }
                 else{
@@ -66,7 +64,7 @@ public class ChecklistActivity extends AppCompatActivity {
         }
         else if (savedInstanceState != null){
             //Saved a checklist id from a new checklist
-            checklist = checklistManager.read(savedInstanceState.getLong(ChecklistActivity.ID_KEY));
+            checklist = checklistManager.read(savedInstanceState.getLong(ChecklistUtility.ID_KEY));
             adapter = new ChecklistAdapter(this, checklist.getItems(), R.id.handle);
             listView.setDragNDropAdapter(adapter);
             switchToEditMode();
@@ -80,7 +78,7 @@ public class ChecklistActivity extends AppCompatActivity {
             switchToEditMode();
         }
         if (savedInstanceState != null){
-            mode = ChecklistMode.valueOf(savedInstanceState.getCharSequence(MainActivity.MODE_KEY).toString());
+            mode = ChecklistMode.valueOf(savedInstanceState.getCharSequence(ChecklistUtility.MODE_KEY).toString());
             if (ChecklistMode.CHECK.equals(mode)){
                 switchToCheckMode();
             }
@@ -139,8 +137,8 @@ public class ChecklistActivity extends AppCompatActivity {
     protected void onSaveInstanceState (Bundle outState) {
         //When orientation changes
         super.onSaveInstanceState(outState);
-        outState.putCharSequence(MainActivity.MODE_KEY, mode.toString());
-        outState.putLong(ChecklistActivity.ID_KEY, checklist.getId());
+        outState.putCharSequence(ChecklistUtility.MODE_KEY, mode.toString());
+        outState.putLong(ChecklistUtility.ID_KEY, checklist.getId());
     }
 
     @Override
@@ -382,6 +380,7 @@ public class ChecklistActivity extends AppCompatActivity {
 
     private void switchToCheckMode(){
         mode = ChecklistMode.CHECK;
+        ChecklistUtility.hideSoftKeyboard(this);
         FloatingActionButton fabCh = (FloatingActionButton) findViewById(R.id.fab_ch);
         FloatingActionButton fabCi = (FloatingActionButton) findViewById(R.id.fab_ci);
         FloatingActionButton fabClear = (FloatingActionButton) findViewById(R.id.fab_clear);

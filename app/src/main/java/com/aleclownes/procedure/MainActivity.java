@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
     private static String TAG = "MainActivity";
     List<Checklist> checklists = new ArrayList<>();
     private ChecklistMode mode;
-    public static String MODE_KEY = "MODE";
     Menu menu;
 
     @Override
@@ -41,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (savedInstanceState != null){
-            mode = ChecklistMode.valueOf(savedInstanceState.getCharSequence(MODE_KEY).toString());
+            mode = ChecklistMode.valueOf(savedInstanceState.getCharSequence(ChecklistUtility.MODE_KEY).toString());
         }
         else {
             mode = ChecklistMode.CHECK;
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                         checklistManager.create(checklist);
                         checklists.add(checklist);
                         Intent editIntent = new Intent(MainActivity.this, ChecklistActivity.class);
-                        editIntent.putExtra(ChecklistActivity.ID_KEY, checklist.getId());
+                        editIntent.putExtra(ChecklistUtility.ID_KEY, checklist.getId());
                         MainActivity.this.startActivity(editIntent);
                     }
                 });
@@ -104,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState (Bundle outState) {
         //When orientation changes
         super.onSaveInstanceState(outState);
-        outState.putCharSequence(MODE_KEY, mode.toString());
+        outState.putCharSequence(ChecklistUtility.MODE_KEY, mode.toString());
     }
 
     @Override
@@ -179,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void switchToCheckMode(){
         mode = ChecklistMode.CHECK;
+        ChecklistUtility.hideSoftKeyboard(this);
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
         checklistManager.saveAllChecklists(checklists);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         Intent editIntent = new Intent(MainActivity.this, ChecklistActivity.class);
-                        editIntent.putExtra(ChecklistActivity.ID_KEY, item.getId());
+                        editIntent.putExtra(ChecklistUtility.ID_KEY, item.getId());
                         startActivity(editIntent);
                     }
                 });
