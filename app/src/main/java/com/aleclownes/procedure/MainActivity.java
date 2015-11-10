@@ -1,11 +1,14 @@
 package com.aleclownes.procedure;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -49,8 +53,37 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, ChecklistActivity.class);
-                startActivity(intent);
+                //Create dialog for checklist title
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(R.string.enter_title);
+                final EditText input = new EditText(MainActivity.this);
+                input.setHint(R.string.checklist_title_hint);
+                input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+                builder.setView(input);
+                builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String title = input.getText().toString();
+                        ChecklistManager checklistManager = new ChecklistManagerImpl(MainActivity.this);
+                        Checklist checklist = new Checklist();
+                        checklist.setTitle(title);
+                        checklistManager.create(checklist);
+                        checklists.add(checklist);
+                        Intent editIntent = new Intent(MainActivity.this, ChecklistActivity.class);
+                        editIntent.putExtra(ChecklistActivity.ID_KEY, checklist.getId());
+                        MainActivity.this.startActivity(editIntent);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                //Sets keyboard visible
+                dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+                dialog.show();
             }
         });
 

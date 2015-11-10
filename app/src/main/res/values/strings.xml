@@ -12,4 +12,5 @@
 
     <string name="edit_mode">EDIT</string>
     <string name="check_mode">DONE</string>
+    <string name="enter_title">Checklist Title</string>
 </resources>
