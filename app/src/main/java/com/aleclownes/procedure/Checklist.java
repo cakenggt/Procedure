@@ -12,19 +12,7 @@ public class Checklist implements Serializable {
     protected long parentId;
     protected long id;
     protected String title = "";
-    protected List<ChecklistItem> items = new ArrayList<ChecklistItem>();
-
-    public Checklist(Checklist checklist){
-        this.title = checklist.title;
-        for (ChecklistItem item : checklist.items){
-            if (item instanceof ChecklistHeader){
-                items.add(new ChecklistHeader(item.getText()));
-            }
-            else if (item instanceof ChecklistEntry){
-                items.add(new ChecklistEntry(item.getText()));
-            }
-        }
-    }
+    protected List<ChecklistItem> items = new ArrayList<>();
 
     public Checklist(){}
 

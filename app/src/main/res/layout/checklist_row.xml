@@ -4,25 +4,30 @@
     android:id="@+id/colLayout"
     android:orientation="vertical">
 
-    <View
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="@dimen/checklist_list_row_height"
         android:id="@+id/divider"
-        android:background="@android:color/darker_gray"
-        android:layout_marginTop="@dimen/checklist_row_vertical_padding" />
+        android:gravity="center_vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+    </LinearLayout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_width="match_parent" android:layout_height="@dimen/checklist_list_row_height"
         android:id="@+id/rowLayout"
-        android:orientation="horizontal"
-        android:layout_marginTop="@dimen/checklist_row_vertical_padding">
+        android:orientation="horizontal">
 
         <CheckBox
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/checkBox"
             android:layout_weight="1"
-            android:layout_gravity="left"
+            android:layout_gravity="center_vertical|left"
             android:layout_marginLeft="-7dp"
             android:paddingLeft="@dimen/checkbox_padding" />
 
@@ -38,12 +43,11 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/itemText"
-            android:layout_marginBottom="8dp"
             android:textColor="@color/gray1"
             android:layout_gravity="center_vertical"
-            android:layout_marginTop="5dp" />
+            android:gravity="center_vertical" />
 
         <EditText
             android:layout_width="wrap_content"
