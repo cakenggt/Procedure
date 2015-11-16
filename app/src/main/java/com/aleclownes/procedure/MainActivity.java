@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     List<Checklist> checklists = new ArrayList<>();
     private ChecklistMode mode;
     Menu menu;
+    String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         else {
             mode = ChecklistMode.CHECK;
         }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -96,6 +99,21 @@ public class MainActivity extends AppCompatActivity {
         for (Checklist check : checklistManager.getAllChecklists()){
             checklists.add(check);
         }
+
+        //Getting Shared Preferences
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.shared_preferences_file_key),
+                Context.MODE_PRIVATE);
+        token = sharedPref.getString(getString(R.string.token_key), null);
+        if (token != null){
+            //TODO attempt to sync checklists
+
+        }
+        else{
+            //placeholder login, get with a fragment
+            new ChecklistSyncTask(adapter, checklists, this).execute(ChecklistSyncTask.LOGIN,
+                    "username", "password");
+        }
+
         ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
     }
 

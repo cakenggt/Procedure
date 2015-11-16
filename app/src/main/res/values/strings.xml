@@ -13,4 +13,7 @@
     <string name="edit_mode">EDIT</string>
     <string name="check_mode">DONE</string>
     <string name="enter_title">Checklist Title</string>
+
+    <string name="shared_preferences_file_key">com.aleclownes.procedure.sharedPreferences</string>
+    <string name="token_key">com.aleclownes.procedure.token</string>
 </resources>
