@@ -93,7 +93,7 @@ public class ChecklistActivity extends AppCompatActivity {
         fabCh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ChecklistActivity.this.checklist.getItems().add(new ChecklistHeader());
+                ChecklistActivity.this.checklist.getItems().add(new ChecklistItem());
                 Log.d(TAG, "Header add button clicked");
                 adapter.notifyDataSetChanged();
                 int newChildIndex = checklist.getItems().size()-1;
@@ -106,7 +106,9 @@ public class ChecklistActivity extends AppCompatActivity {
         fabCi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ChecklistActivity.this.checklist.getItems().add(new ChecklistEntry());
+                ChecklistItem item = new ChecklistItem();
+                item.setCheckable(true);
+                ChecklistActivity.this.checklist.getItems().add(item);
                 Log.d(TAG, "Item add button clicked");
                 adapter.notifyDataSetChanged();
                 int newChildIndex = checklist.getItems().size() - 1;
@@ -120,8 +122,8 @@ public class ChecklistActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 for (ChecklistItem item : ChecklistActivity.this.checklist.getItems()) {
-                    if (item instanceof ChecklistEntry) {
-                        ((ChecklistEntry) item).setChecked(false);
+                    if (item.isCheckable()) {
+                        item.setChecked(false);
                     }
                 }
                 adapter.notifyDataSetChanged();
@@ -220,19 +222,18 @@ public class ChecklistActivity extends AppCompatActivity {
                 Log.d(TAG, "working checklist");
                 rowView.findViewById(R.id.itemEdit).setVisibility(View.GONE);
                 //Put check box if entry
-                if (item instanceof ChecklistEntry){
-                    final ChecklistEntry entry = (ChecklistEntry)item;
+                if (item.isCheckable()){
                     rowView.findViewById(R.id.itemText).setVisibility(View.GONE);
                     final CheckBox check = (CheckBox)rowView.findViewById(R.id.checkBox);
                     textView = check;
-                    if (entry.isChecked()){
+                    if (item.isChecked()){
                         check.setChecked(true);
                         textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     }
                     check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                            entry.setChecked(isChecked);
+                            item.setChecked(isChecked);
                             if (isChecked) {
                                 //Add strikethrough
                                 buttonView.setPaintFlags(buttonView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -244,8 +245,8 @@ public class ChecklistActivity extends AppCompatActivity {
                             FloatingActionButton fabClear = (FloatingActionButton) findViewById(R.id.fab_clear);
                             boolean show = false;
                             for (ChecklistItem item : checklist.getItems()){
-                                if (item instanceof ChecklistEntry){
-                                    if (((ChecklistEntry)item).isChecked()){
+                                if (item.isCheckable()){
+                                    if (item.isChecked()){
                                         fabClear.show();
                                         show = true;
                                         break;
@@ -287,7 +288,7 @@ public class ChecklistActivity extends AppCompatActivity {
                 //If something strange happens, put it in a text view
                 textView = (TextView)rowView.findViewById(R.id.itemText);
             }
-            if (item instanceof ChecklistHeader){
+            if (!item.isCheckable()){
                 textView.setTextColor(getResources().getColor(R.color.gray1));
                 if (position != 0) {
                     colView.findViewById(R.id.divider).setVisibility(View.VISIBLE);
@@ -389,8 +390,8 @@ public class ChecklistActivity extends AppCompatActivity {
         fabCi.hide();
         boolean show = false;
         for (ChecklistItem item : checklist.getItems()){
-            if (item instanceof ChecklistEntry){
-                if (((ChecklistEntry)item).isChecked()){
+            if (item.isCheckable()){
+                if (item.isChecked()){
                     fabClear.show();
                     show = true;
                     break;

@@ -8,8 +8,24 @@ import java.io.Serializable;
 public class ChecklistItem implements Serializable {
 
     protected String text = "";
+    private boolean checkable = false;
+    private boolean checked = false;
 
+    public boolean isCheckable() {
+        return checkable;
+    }
 
+    public void setCheckable(boolean checkable) {
+        this.checkable = checkable;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
+    }
 
     public String getText() {
         return text;

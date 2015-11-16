@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.shared_preferences_file_key),
                 Context.MODE_PRIVATE);
         token = sharedPref.getString(getString(R.string.token_key), null);
+        /**
         if (token != null){
             //TODO attempt to sync checklists
 
@@ -113,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
             new ChecklistSyncTask(adapter, checklists, this).execute(ChecklistSyncTask.LOGIN,
                     "username", "password");
         }
+         **/
 
         ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
     }
@@ -234,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView circleIcon = (TextView)rowView.findViewById(R.id.circle_icon);
                 int contents = 0;
                 for (ChecklistItem iteme : item.getItems()){
-                    if (iteme instanceof ChecklistEntry){
+                    if (iteme.isCheckable()){
                         contents++;
                     }
                 }
