@@ -69,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
                         ChecklistManager checklistManager = new ChecklistManagerImpl(MainActivity.this);
                         Checklist checklist = new Checklist();
                         checklist.setTitle(title);
+                        checklist.setOrder(checklists.size());
+                        new ChecklistSyncTask(null, checklists, checklist, MainActivity.this).execute(ChecklistSyncTask.CREATE_CHECKLIST,
+                                ChecklistSyncTask.jsonifyChecklist(checklist).toString());
                         checklistManager.create(checklist);
                         checklists.add(checklist);
                         Intent editIntent = new Intent(MainActivity.this, ChecklistActivity.class);
@@ -107,10 +110,10 @@ public class MainActivity extends AppCompatActivity {
 
         if (token == null){
             //placeholder login, get with a fragment
-            new ChecklistSyncTask(adapter, checklists, this).execute(ChecklistSyncTask.LOGIN,
-                    "username", "password");
+            new ChecklistSyncTask(adapter, checklists, null, this).execute(ChecklistSyncTask.LOGIN,
+                    "alownes", "alownes");
         }
-        new ChecklistSyncTask(adapter, checklists, this).execute(ChecklistSyncTask.GET_ALL_CHECKLISTS);
+        new ChecklistSyncTask(adapter, checklists, null, this).execute(ChecklistSyncTask.GET_ALL_CHECKLISTS);
 
 
         ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();

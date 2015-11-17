@@ -14,7 +14,7 @@ import java.util.List;
 public class Checklist implements Serializable {
 
     protected Long parentId;
-    protected long id;
+    protected Long id;
     protected int order;
     protected String title = "";
     protected List<ChecklistItem> items = new ArrayList<>();
@@ -40,11 +40,11 @@ public class Checklist implements Serializable {
         }
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

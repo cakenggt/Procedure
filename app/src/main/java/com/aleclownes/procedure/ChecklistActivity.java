@@ -26,6 +26,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChecklistActivity extends AppCompatActivity {
@@ -147,7 +148,10 @@ public class ChecklistActivity extends AppCompatActivity {
     public void onPause(){
         super.onPause();
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
+        new ChecklistSyncTask(null, new ArrayList<Checklist>(), checklist, this).execute(ChecklistSyncTask.CREATE_CHECKLIST,
+                ChecklistSyncTask.jsonifyChecklist(checklist).toString());
         checklistManager.update(checklist);
+
     }
 
     @Override

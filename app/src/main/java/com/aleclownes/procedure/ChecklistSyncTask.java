@@ -31,6 +31,7 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
     private String baseUrl = "http://10.0.2.2:8000/procedure/";
     private final ArrayAdapter adapter;
     private final List<Checklist> checklists;
+    private final Checklist checklist;
     private final Context context;
     private static String TAG = "MainActivity";
 
@@ -38,10 +39,11 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
     public static final String CREATE_CHECKLIST = "create-checklist/";
     public static final String LOGIN = "api-token-auth/";
 
-    public ChecklistSyncTask(ArrayAdapter adapter, List<Checklist> checklists, Context context){
+    public ChecklistSyncTask(ArrayAdapter adapter, List<Checklist> checklists, Checklist checklist, Context context){
         this.adapter = adapter;
         this.checklists = checklists;
         this.context = context;
+        this.checklist = checklist;
     }
 
     @Override
@@ -61,6 +63,15 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
                 buildAndUpdateChecklists(checklistList, result);
                 break;
             case CREATE_CHECKLIST:
+                token = sharedPref.getString(context.getString(R.string.token_key), "");
+                result = doRequest(params[1].getBytes(), "POST", baseUrl + CREATE_CHECKLIST, token);
+                try {
+                    checklist.setId(result.getJSONObject("checklist").getLong("pk"));
+                    ChecklistManager checklistManager = new ChecklistManagerImpl(context);
+                    return checklistManager.getAllChecklists();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
             case LOGIN:
                 String username = params[1];
@@ -165,5 +176,34 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public static JSONObject jsonifyChecklist(Checklist checklist){
+        JSONObject json = new JSONObject();
+        try {
+            if (checklist.getId() != null) {
+                json.put("pk", checklist.getId());
+            }
+            json.put("title", checklist.getTitle());
+            json.put("parent", checklist.getParentId());
+            json.put("order", checklist.getOrder());
+            List<JSONObject> checklistItems = new ArrayList<>();
+            for (int i = 0; i < checklist.getItems().size(); i++){
+                ChecklistItem item = checklist.getItems().get(i);
+                JSONObject itemJ = new JSONObject();
+                itemJ.put("text", item.getText());
+                itemJ.put("checkable", item.isCheckable());
+                itemJ.put("checked", item.isChecked());
+                if (item.getId() != null){
+                    itemJ.put("pk", item.getId());
+                }
+                itemJ.put("order", i);
+                checklistItems.add(itemJ);
+            }
+            json.put("items", new JSONArray(checklistItems));
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return json;
     }
 }
