@@ -110,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
             new ChecklistSyncTask(adapter, checklists, this).execute(ChecklistSyncTask.LOGIN,
                     "username", "password");
         }
-        //TODO attempt to sync checklists
         new ChecklistSyncTask(adapter, checklists, this).execute(ChecklistSyncTask.GET_ALL_CHECKLISTS);
 
 
