@@ -104,17 +104,15 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.shared_preferences_file_key),
                 Context.MODE_PRIVATE);
         token = sharedPref.getString(getString(R.string.token_key), null);
-        /**
-        if (token != null){
-            //TODO attempt to sync checklists
 
-        }
-        else{
+        if (token == null){
             //placeholder login, get with a fragment
             new ChecklistSyncTask(adapter, checklists, this).execute(ChecklistSyncTask.LOGIN,
                     "username", "password");
         }
-         **/
+        //TODO attempt to sync checklists
+        new ChecklistSyncTask(adapter, checklists, this).execute(ChecklistSyncTask.GET_ALL_CHECKLISTS);
+
 
         ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
     }

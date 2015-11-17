@@ -25,18 +25,20 @@ public class ChecklistManagerImpl implements ChecklistManager {
         if (checklists == null){
             checklists = new ArrayList<Checklist>();
         }
-        long maxId = 0;
-        for (int i = 0; i < checklists.size(); i++){
-            Checklist next = checklists.get(i);
-            if (next.getId() >= maxId){
-                maxId = next.getId();
+        if (checklist.getId() != 0) {
+            long maxId = 0;
+            for (int i = 0; i < checklists.size(); i++) {
+                Checklist next = checklists.get(i);
+                if (next.getId() >= maxId) {
+                    maxId = next.getId();
+                }
             }
+            long newId = maxId + 1;
+            checklist.setId(newId);
         }
-        long newId = maxId + 1;
-        checklist.setId(newId);
         checklists.add(checklist);
         saveAllChecklists(checklists);
-        return newId;
+        return checklist.getId();
     }
 
     @Override
