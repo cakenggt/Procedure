@@ -38,6 +38,7 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
     public static final String GET_ALL_CHECKLISTS = "get-all-checklists/";
     public static final String CREATE_CHECKLIST = "create-checklist/";
     public static final String LOGIN = "api-token-auth/";
+    public static final String SAVE_CHECKLIST_ORDER = "save-checklist-order/";
 
     public ChecklistSyncTask(ArrayAdapter adapter, List<Checklist> checklists, Checklist checklist, Context context){
         this.adapter = adapter;
@@ -56,7 +57,13 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
         JSONObject result;
         List<Checklist> checklistList = new ArrayList<>();
         checklistList.addAll(this.checklists);
+        ChecklistManager checklistManager = new ChecklistManagerImpl(context);
         switch(type) {
+            case SAVE_CHECKLIST_ORDER:
+                token = sharedPref.getString(context.getString(R.string.token_key), "");
+                doRequest(jsonifyChecklistOrder().toString().getBytes(), "POST",
+                        baseUrl + SAVE_CHECKLIST_ORDER, token);
+                return checklistManager.getAllChecklists();
             case GET_ALL_CHECKLISTS:
                 token = sharedPref.getString(context.getString(R.string.token_key), "");
                 result = doRequest(new byte[0], "GET", baseUrl + GET_ALL_CHECKLISTS, token);
@@ -67,7 +74,6 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
                 result = doRequest(params[1].getBytes(), "POST", baseUrl + CREATE_CHECKLIST, token);
                 try {
                     checklist.setId(result.getJSONObject("checklist").getLong("pk"));
-                    ChecklistManager checklistManager = new ChecklistManagerImpl(context);
                     return checklistManager.getAllChecklists();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -201,6 +207,23 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
                 checklistItems.add(itemJ);
             }
             json.put("items", new JSONArray(checklistItems));
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+    private JSONObject jsonifyChecklistOrder(){
+        JSONObject json = new JSONObject();
+        List<JSONObject> checklistOrder = new ArrayList<>();
+        try {
+            for (Checklist checklist : checklists){
+                JSONObject cJson = new JSONObject();
+                cJson.put("pk", checklist.getId());
+                cJson.put("title", checklist.getTitle());
+                checklistOrder.add(cJson);
+            }
+            json.put("checklists", new JSONArray(checklistOrder));
         }catch (JSONException e) {
             e.printStackTrace();
         }

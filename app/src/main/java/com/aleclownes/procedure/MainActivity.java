@@ -200,6 +200,10 @@ public class MainActivity extends AppCompatActivity {
         mode = ChecklistMode.CHECK;
         ChecklistUtility.hideSoftKeyboard(this);
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
+        for (int i = 0; i < checklists.size(); i++){
+            checklists.get(i).setOrder(i);
+        }
+        new ChecklistSyncTask(null, checklists, null, this).execute(ChecklistSyncTask.SAVE_CHECKLIST_ORDER);
         checklistManager.saveAllChecklists(checklists);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.show();
