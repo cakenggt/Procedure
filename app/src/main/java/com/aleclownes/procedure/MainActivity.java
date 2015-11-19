@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
                         checklists.add(checklist);
                         Intent editIntent = new Intent(MainActivity.this, ChecklistActivity.class);
                         editIntent.putExtra(ChecklistUtility.ID_KEY, checklist.getId());
+                        editIntent.putExtra(ChecklistUtility.CHECKLIST_TYPE_KEY, ChecklistUtility.EDIT_MODE);
                         MainActivity.this.startActivity(editIntent);
                     }
                 });
