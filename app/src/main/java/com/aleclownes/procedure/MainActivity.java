@@ -70,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
                         Checklist checklist = new Checklist();
                         checklist.setTitle(title);
                         checklist.setOrder(checklists.size());
-                        new ChecklistSyncTask(null, checklists, checklist, MainActivity.this).execute(ChecklistSyncTask.CREATE_CHECKLIST,
-                                ChecklistSyncTask.jsonifyChecklist(checklist).toString());
                         checklistManager.create(checklist);
                         checklists.add(checklist);
                         Intent editIntent = new Intent(MainActivity.this, ChecklistActivity.class);

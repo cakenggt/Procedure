@@ -5,7 +5,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,6 +20,7 @@ public class Checklist implements Serializable {
     protected int order;
     protected String title = "";
     protected List<ChecklistItem> items = new ArrayList<>();
+    protected Date lastModified = new Date();
 
     public Checklist(){}
 
@@ -30,6 +33,7 @@ public class Checklist implements Serializable {
             } catch (JSONException e){
                 parentId = null;
             }
+            lastModified = new Date(json.getLong("last_modified"));
             title = json.getString("title");
             JSONArray jsonItems = json.getJSONArray("items");
             for (int i = 0; i < jsonItems.length(); i++){
@@ -78,5 +82,13 @@ public class Checklist implements Serializable {
 
     public void setOrder(int order) {
         this.order = order;
+    }
+
+    public Date getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
     }
 }

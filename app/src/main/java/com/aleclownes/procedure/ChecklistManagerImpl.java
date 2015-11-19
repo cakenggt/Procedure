@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,6 +25,15 @@ public class ChecklistManagerImpl implements ChecklistManager {
         List<Checklist> checklists = (List<Checklist>)readObjectFromMemory(CHECKLIST_LIST_FILENAME);
         if (checklists == null){
             checklists = new ArrayList<Checklist>();
+        }
+        if (checklist.getId() == null){
+            long minId = 0;
+            for (Checklist c : checklists){
+                if (c.getId() < minId){
+                    minId = c.getId();
+                }
+            }
+            checklist.setId(minId-1);
         }
         checklists.add(checklist);
         saveAllChecklists(checklists);
@@ -46,9 +56,10 @@ public class ChecklistManagerImpl implements ChecklistManager {
         if (checklists == null){
             checklists = new ArrayList<Checklist>();
         }
+        checklist.setLastModified(new Date());
         for (int i = 0; i < checklists.size(); i++){
             Checklist next = checklists.get(i);
-            if (next.getId() == checklist.getId()){
+            if (next.getId().equals(checklist.getId())){
                 checklists.set(i, checklist);
                 saveAllChecklists(checklists);
                 return;

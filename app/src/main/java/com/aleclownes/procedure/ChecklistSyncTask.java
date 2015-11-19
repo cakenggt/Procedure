@@ -22,6 +22,8 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -73,7 +75,18 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
                 token = sharedPref.getString(context.getString(R.string.token_key), "");
                 result = doRequest(params[1].getBytes(), "POST", baseUrl + CREATE_CHECKLIST, token);
                 try {
-                    checklist.setId(result.getJSONObject("checklist").getLong("pk"));
+                    //This method is called on new unsaved checklists and already saved checklists
+                    if (checklist.getId() < 0){
+                        //Unsaved checklist
+                        checklistManager.delete(checklist.getId());
+                        checklist.setId(result.getJSONObject("checklist").getLong("pk"));
+                        checklistManager.create(checklist);
+                    }
+                    else{
+                        //Already saved checklist
+                        //This updates the last_modified date
+                        checklistManager.update(checklist);
+                    }
                     return checklistManager.getAllChecklists();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -171,14 +184,52 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
     }
 
     private void buildAndUpdateChecklists(List<Checklist> checklistList, JSONObject json){
-        List<Checklist> retrieved = new ArrayList<Checklist>();
+        ChecklistManager checklistManager = new ChecklistManagerImpl(context);
+        //These two sets help determine which checklists should be uploaded to server or deleted from local
+        HashSet<Long> currentIdSet = new HashSet<>();
+        HashSet<Long> receivedIdSet = new HashSet<>();
+        for (Checklist checklist : checklistList){
+            currentIdSet.add(checklist.getId());
+        }
         try {
             JSONArray checklists = json.getJSONArray("checklists");
             for (int i = 0; i < checklists.length(); i++){
-                retrieved.add(new Checklist(checklists.getJSONObject(i)));
+                Checklist checklist = new Checklist(checklists.getJSONObject(i));
+                receivedIdSet.add(checklist.getId());
+                Checklist savedChecklist = checklistManager.read(checklist.getId());
+                if (savedChecklist == null){
+                    checklistManager.create(checklist);
+                }
+                else{
+                    if (savedChecklist.getLastModified().after(checklist.getLastModified())){
+                        //send saved checklist to the server
+                        checklistManager.update(checklist);
+                        new ChecklistSyncTask(null, new ArrayList<Checklist>(), checklist, context).execute(ChecklistSyncTask.CREATE_CHECKLIST,
+                                ChecklistSyncTask.jsonifyChecklist(checklist).toString());
+                    }
+                    else{
+                        //Update existing checklist
+                        checklistManager.update(checklist);
+                    }
+                }
+            }
+            //Find which ids in local do not appear in the server
+            currentIdSet.removeAll(receivedIdSet);
+            for (Long id : currentIdSet){
+                Checklist checklist = checklistManager.read(id);
+                if (id < 0){
+                    //TODO If the id is negative, post to server and update lastModified
+                    checklistManager.update(checklist);
+                    new ChecklistSyncTask(null, new ArrayList<Checklist>(), checklist, context).execute(ChecklistSyncTask.CREATE_CHECKLIST,
+                            ChecklistSyncTask.jsonifyChecklist(checklist).toString());
+                }
+                else{
+                    //TODO If the id is positive, remove the local checklist
+                    checklistManager.delete(id);
+                }
             }
             checklistList.clear();
-            checklistList.addAll(retrieved);
+            checklistList.addAll(checklistManager.getAllChecklists());
         } catch (JSONException e) {
             e.printStackTrace();
         }
