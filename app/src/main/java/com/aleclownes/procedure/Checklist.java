@@ -21,6 +21,7 @@ public class Checklist implements Serializable {
     protected String title = "";
     protected List<ChecklistItem> items = new ArrayList<>();
     protected Date lastModified = new Date();
+    protected boolean unSynced = true;
 
     public Checklist(){}
 
@@ -39,6 +40,7 @@ public class Checklist implements Serializable {
             for (int i = 0; i < jsonItems.length(); i++){
                 items.add(new ChecklistItem(jsonItems.getJSONObject(i)));
             }
+            unSynced = false;
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -90,5 +92,13 @@ public class Checklist implements Serializable {
 
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
+    }
+
+    public boolean isUnSynced() {
+        return unSynced;
+    }
+
+    public void setUnSynced(boolean unSynced) {
+        this.unSynced = unSynced;
     }
 }

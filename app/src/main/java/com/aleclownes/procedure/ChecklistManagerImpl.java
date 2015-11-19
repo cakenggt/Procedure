@@ -27,13 +27,13 @@ public class ChecklistManagerImpl implements ChecklistManager {
             checklists = new ArrayList<Checklist>();
         }
         if (checklist.getId() == null){
-            long minId = 0;
+            long maxId = 0;
             for (Checklist c : checklists){
-                if (c.getId() < minId){
-                    minId = c.getId();
+                if (c.getId() > maxId){
+                    maxId = c.getId();
                 }
             }
-            checklist.setId(minId-1);
+            checklist.setId(maxId+1);
         }
         checklists.add(checklist);
         saveAllChecklists(checklists);

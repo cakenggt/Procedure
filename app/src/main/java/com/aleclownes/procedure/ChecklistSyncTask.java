@@ -76,10 +76,11 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
                 result = doRequest(params[1].getBytes(), "POST", baseUrl + CREATE_CHECKLIST, token);
                 try {
                     //This method is called on new unsaved checklists and already saved checklists
-                    if (checklist.getId() < 0){
+                    if (checklist.isUnSynced()){
                         //Unsaved checklist
                         checklistManager.delete(checklist.getId());
                         checklist.setId(result.getJSONObject("checklist").getLong("pk"));
+                        checklist.setUnSynced(false);
                         checklistManager.create(checklist);
                     }
                     else{
@@ -161,7 +162,7 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
 
             int bytesRead=0;
             while( (bytesRead = in.read(contents)) != -1){
-                strFileContents = new String(contents, 0, bytesRead);
+                strFileContents += new String(contents, 0, bytesRead);
             }
 
         } catch (ProtocolException e) {
@@ -217,14 +218,18 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
             currentIdSet.removeAll(receivedIdSet);
             for (Long id : currentIdSet){
                 Checklist checklist = checklistManager.read(id);
-                if (id < 0){
-                    //TODO If the id is negative, post to server and update lastModified
+                if (checklist == null){
+                    //If already deleted, continue
+                    continue;
+                }
+                if (checklist.isUnSynced()){
+                    //If the id is negative, post to server and update lastModified
                     checklistManager.update(checklist);
                     new ChecklistSyncTask(null, new ArrayList<Checklist>(), checklist, context).execute(ChecklistSyncTask.CREATE_CHECKLIST,
                             ChecklistSyncTask.jsonifyChecklist(checklist).toString());
                 }
                 else{
-                    //TODO If the id is positive, remove the local checklist
+                    //If the id is positive, remove the local checklist
                     checklistManager.delete(id);
                 }
             }
@@ -258,6 +263,7 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
                 checklistItems.add(itemJ);
             }
             json.put("items", new JSONArray(checklistItems));
+            json.put("unSynced", checklist.isUnSynced());
         }catch (JSONException e) {
             e.printStackTrace();
         }
@@ -269,6 +275,11 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
         List<JSONObject> checklistOrder = new ArrayList<>();
         try {
             for (Checklist checklist : checklists){
+                if (checklist.isUnSynced()){
+                    //If it is unsynced, the server will try to delete a non-existing checklist.
+                    //Prevent this from happening.
+                    continue;
+                }
                 JSONObject cJson = new JSONObject();
                 cJson.put("pk", checklist.getId());
                 cJson.put("title", checklist.getTitle());
