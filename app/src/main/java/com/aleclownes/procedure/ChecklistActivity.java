@@ -163,13 +163,17 @@ public class ChecklistActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.checklist, menu);
         this.menu = menu;
-        if (mode == ChecklistMode.CHECK){
-            menu.getItem(0).setTitle(R.string.edit_mode);
-            menu.getItem(0).setIcon(R.drawable.ic_mode_edit_white_24dp);
+        if (checklist.getParentId() == null) {
+            if (mode == ChecklistMode.CHECK) {
+                menu.getItem(0).setTitle(R.string.edit_mode);
+                menu.getItem(0).setIcon(R.drawable.ic_mode_edit_white_24dp);
+            } else if (mode == ChecklistMode.EDIT) {
+                menu.getItem(0).setTitle(R.string.check_mode);
+                menu.getItem(0).setIcon(null);
+            }
         }
-        else if (mode == ChecklistMode.EDIT){
-            menu.getItem(0).setTitle(R.string.check_mode);
-            menu.getItem(0).setIcon(null);
+        else{
+            menu.getItem(0).setVisible(false);
         }
         return true;
     }
@@ -348,6 +352,10 @@ public class ChecklistActivity extends AppCompatActivity {
     }
 
     private void switchToEditMode(){
+        if (checklist.getParentId() != null){
+            switchToCheckMode();
+            return;
+        }
         mode = ChecklistMode.EDIT;
         DragNDropListView listView = (DragNDropListView) findViewById(R.id.checklistListView);
         FloatingActionButton fabCh = (FloatingActionButton) findViewById(R.id.fab_ch);

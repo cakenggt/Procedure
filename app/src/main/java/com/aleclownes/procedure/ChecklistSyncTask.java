@@ -210,8 +210,8 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
                 else{
                     if (savedChecklist.getLastModified().after(checklist.getLastModified())){
                         //send saved checklist to the server
-                        new ChecklistSyncTask(null, new ArrayList<Checklist>(), checklist, context).execute(ChecklistSyncTask.CREATE_CHECKLIST,
-                                ChecklistSyncTask.jsonifyChecklist(checklist).toString());
+                        new ChecklistSyncTask(null, new ArrayList<Checklist>(), savedChecklist, context).execute(ChecklistSyncTask.CREATE_CHECKLIST,
+                                ChecklistSyncTask.jsonifyChecklist(savedChecklist).toString());
                     }
                     else{
                         //Update existing checklist
