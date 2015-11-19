@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.text.Editable;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private ChecklistMode mode;
     Menu menu;
     String token;
+    AsyncTask apiRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,10 +110,14 @@ public class MainActivity extends AppCompatActivity {
 
         if (token == null){
             //placeholder login, get with a fragment
-            new ChecklistSyncTask(adapter, checklists, null, this).execute(ChecklistSyncTask.LOGIN,
+            cancelLastRequest();
+            apiRequest = new ChecklistSyncTask(adapter, checklists, null, this).execute(ChecklistSyncTask.LOGIN,
                     "alownes", "alownes");
         }
-        new ChecklistSyncTask(adapter, checklists, null, this).execute(ChecklistSyncTask.GET_ALL_CHECKLISTS);
+        else {
+            cancelLastRequest();
+            apiRequest = new ChecklistSyncTask(adapter, checklists, null, this).execute(ChecklistSyncTask.GET_ALL_CHECKLISTS);
+        }
 
 
         ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
@@ -129,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
         checklistManager.saveAllChecklists(checklists);
+        cancelLastRequest();
     }
 
     @Override
@@ -201,8 +208,11 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < checklists.size(); i++){
             checklists.get(i).setOrder(i);
         }
-        new ChecklistSyncTask(null, checklists, null, this).execute(ChecklistSyncTask.SAVE_CHECKLIST_ORDER);
         checklistManager.saveAllChecklists(checklists);
+        if (apiRequest == null || apiRequest.isCancelled()) {
+            //Only save the checklist order if there are no other api requests, since it overwrites other data
+            apiRequest = new ChecklistSyncTask(null, checklists, null, this).execute(ChecklistSyncTask.SAVE_CHECKLIST_ORDER);
+        }
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.show();
         DragNDropListView listView = (DragNDropListView) findViewById(R.id.checklistListListView);
@@ -210,6 +220,12 @@ public class MainActivity extends AppCompatActivity {
             menu.getItem(0).setIcon(R.drawable.ic_mode_edit_white_24dp);
         }
         ((ChecklistListAdapter)listView.getAdapter()).notifyDataSetChanged();
+    }
+
+    private void cancelLastRequest(){
+        if (apiRequest != null){
+            apiRequest.cancel(true);
+        }
     }
 
     public class ChecklistListAdapter extends DragNDropArrayAdapter<Checklist> {

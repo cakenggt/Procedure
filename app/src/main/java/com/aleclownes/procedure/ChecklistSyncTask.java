@@ -51,6 +51,9 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
 
     @Override
     protected List<Checklist> doInBackground(String... params) {
+        if (isCancelled()) {
+            return null;
+        }
         // params comes from the execute() call. Pass in stringified object for json as index 1
         String type = params[0];
         String token = "";
@@ -107,6 +110,9 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
                         SharedPreferences.Editor edit = sharedPref.edit();
                         edit.putString(context.getString(R.string.token_key), token);
                         edit.commit();
+                        //Update checklists
+                        JSONObject updateResult = doRequest(new byte[0], "GET", baseUrl + GET_ALL_CHECKLISTS, token);
+                        buildAndUpdateChecklists(checklistList, updateResult);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -119,7 +125,7 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
     @Override
     protected void onPostExecute(List<Checklist> checklistList) {
         if (isCancelled()) {
-            checklistList = null;
+            return;
         }
 
         if (adapter != null) {
@@ -204,7 +210,6 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
                 else{
                     if (savedChecklist.getLastModified().after(checklist.getLastModified())){
                         //send saved checklist to the server
-                        checklistManager.update(checklist);
                         new ChecklistSyncTask(null, new ArrayList<Checklist>(), checklist, context).execute(ChecklistSyncTask.CREATE_CHECKLIST,
                                 ChecklistSyncTask.jsonifyChecklist(checklist).toString());
                     }
@@ -224,9 +229,10 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
                 }
                 if (checklist.isUnSynced()){
                     //If the id is negative, post to server and update lastModified
-                    checklistManager.update(checklist);
                     new ChecklistSyncTask(null, new ArrayList<Checklist>(), checklist, context).execute(ChecklistSyncTask.CREATE_CHECKLIST,
                             ChecklistSyncTask.jsonifyChecklist(checklist).toString());
+                    checklist.setUnSynced(false);
+                    checklistManager.update(checklist);
                 }
                 else{
                     //If the id is positive, remove the local checklist

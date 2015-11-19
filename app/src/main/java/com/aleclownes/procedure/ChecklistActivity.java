@@ -148,8 +148,6 @@ public class ChecklistActivity extends AppCompatActivity {
     public void onPause(){
         super.onPause();
         ChecklistManager checklistManager = new ChecklistManagerImpl(this);
-        new ChecklistSyncTask(null, new ArrayList<Checklist>(), checklist, this).execute(ChecklistSyncTask.CREATE_CHECKLIST,
-                ChecklistSyncTask.jsonifyChecklist(checklist).toString());
         checklistManager.update(checklist);
 
     }
