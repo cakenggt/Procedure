@@ -3,9 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
 
     <item
+        android:id="@+id/login_logout"
+        android:title="@string/login"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/switch_mode"
         android:title="@string/edit_mode"
         android:icon="@drawable/ic_mode_edit_white_24dp"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
 
 </menu>

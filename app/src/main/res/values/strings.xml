@@ -16,4 +16,9 @@
 
     <string name="shared_preferences_file_key">com.aleclownes.procedure.sharedPreferences</string>
     <string name="token_key">com.aleclownes.procedure.token</string>
+
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
 </resources>

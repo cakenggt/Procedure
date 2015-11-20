@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -110,12 +111,27 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
                         SharedPreferences.Editor edit = sharedPref.edit();
                         edit.putString(context.getString(R.string.token_key), token);
                         edit.commit();
+                        ((MainActivity)context).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context,
+                                        "Login Successful", Toast.LENGTH_LONG).show();
+                                ((MainActivity) context).menu.getItem(0).setTitle(context.getString(R.string.logout));
+                            }
+                        });
                         //Update checklists
                         JSONObject updateResult = doRequest(new byte[0], "GET", baseUrl + GET_ALL_CHECKLISTS, token);
                         buildAndUpdateChecklists(checklistList, updateResult);
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    ((MainActivity)context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context,
+                                    "Login Failed", Toast.LENGTH_LONG).show();
+                            ((MainActivity) context).menu.getItem(0).setTitle(context.getString(R.string.logout));
+                        }
+                    });
                 }
                 break;
         }
@@ -229,9 +245,7 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
                         }
                         savedChecklist.getItems().clear();
                         for (ChecklistItem item : checklist.getItems()){
-                            if (checkedIds.contains(item.getId())){
-                                item.setChecked(true);
-                            }
+                            item.setChecked(checkedIds.contains(item.getId()));
                             savedChecklist.getItems().add(item);
                         }
                         //All of the checklist items have been updated with the server's copy

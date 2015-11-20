@@ -1,6 +1,7 @@
 package com.aleclownes.procedure;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,10 +23,12 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     Menu menu;
     String token;
     AsyncTask apiRequest;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,17 +113,10 @@ public class MainActivity extends AppCompatActivity {
                 Context.MODE_PRIVATE);
         token = sharedPref.getString(getString(R.string.token_key), null);
 
-        if (token == null){
-            //placeholder login, get with a fragment
-            cancelLastRequest();
-            apiRequest = new ChecklistSyncTask(adapter, checklists, null, this).execute(ChecklistSyncTask.LOGIN,
-                    "alownes", "alownes");
-        }
-        else {
+        if (token != null){
             cancelLastRequest();
             apiRequest = new ChecklistSyncTask(adapter, checklists, null, this).execute(ChecklistSyncTask.GET_ALL_CHECKLISTS);
         }
-
 
         ((ArrayAdapter<Checklist>)((ListView)findViewById(R.id.checklistListListView)).getAdapter()).notifyDataSetChanged();
     }
@@ -149,6 +146,18 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         this.menu = menu;
+
+        if (token == null){
+            if (menu != null) {
+                menu.getItem(0).setTitle(R.string.login);
+            }
+        }
+        else {
+            if (menu != null) {
+                menu.getItem(0).setTitle(R.string.logout);
+            }
+        }
+
         return true;
     }
 
@@ -167,6 +176,48 @@ public class MainActivity extends AppCompatActivity {
                     switchToCheckMode();
                 }
                 return true;
+            case R.id.login_logout:
+                SharedPreferences sharedPref = getSharedPreferences(getString(R.string.shared_preferences_file_key),
+                        Context.MODE_PRIVATE);
+                if (sharedPref.contains(getString(R.string.token_key))){
+                    //remove token and change button text
+                    SharedPreferences.Editor edit = sharedPref.edit();
+                    edit.remove(getString(R.string.token_key));
+                    edit.commit();
+                    item.setTitle(R.string.login);
+                } else {
+                    //show login dialog
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle(R.string.login);
+                    final View view = getLayoutInflater().inflate(R.layout.login_dialog, null);
+                    final EditText txtUsername = (EditText)view.findViewById(R.id.txtUsername);
+                    final EditText txtPassword = (EditText)view.findViewById(R.id.txtPassword);
+                    txtUsername.setHint(R.string.username);
+                    txtPassword.setHint(R.string.password);
+                    builder.setView(view);
+                    builder.setPositiveButton("Login", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            cancelLastRequest();
+                            apiRequest = new ChecklistSyncTask(
+                                    (ArrayAdapter<Checklist>) ((ListView) findViewById(R.id.checklistListListView)).getAdapter(),
+                                    checklists, null, MainActivity.this).execute(ChecklistSyncTask.LOGIN,
+                                    txtUsername.getText().toString(),
+                                    txtPassword.getText().toString());
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    //Sets keyboard visible
+                    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+                    dialog.show();
+                }
         }
 
         return super.onOptionsItemSelected(item);
@@ -196,8 +247,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         if (menu != null) {
-            menu.getItem(0).setTitle(R.string.check_mode);
-            menu.getItem(0).setIcon(null);
+            menu.getItem(1).setTitle(R.string.check_mode);
+            menu.getItem(1).setIcon(null);
         }
         ((ChecklistListAdapter)listView.getAdapter()).notifyDataSetChanged();
     }
@@ -218,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
         fab.show();
         DragNDropListView listView = (DragNDropListView) findViewById(R.id.checklistListListView);
         if (menu != null) {
-            menu.getItem(0).setIcon(R.drawable.ic_mode_edit_white_24dp);
+            menu.getItem(1).setIcon(R.drawable.ic_mode_edit_white_24dp);
         }
         ((ChecklistListAdapter)listView.getAdapter()).notifyDataSetChanged();
     }
