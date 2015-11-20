@@ -208,14 +208,43 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
                     checklistManager.create(checklist);
                 }
                 else{
-                    if (savedChecklist.getLastModified().after(checklist.getLastModified())){
-                        //send saved checklist to the server
-                        new ChecklistSyncTask(null, new ArrayList<Checklist>(), savedChecklist, context).execute(ChecklistSyncTask.CREATE_CHECKLIST,
-                                ChecklistSyncTask.jsonifyChecklist(savedChecklist).toString());
+                    if (savedChecklist.getParentId() == null) {
+                        //Normal checklist
+                        if (savedChecklist.getLastModified().after(checklist.getLastModified())) {
+                            //send saved checklist to the server
+                            new ChecklistSyncTask(null, new ArrayList<Checklist>(), savedChecklist, context).execute(ChecklistSyncTask.CREATE_CHECKLIST,
+                                    ChecklistSyncTask.jsonifyChecklist(savedChecklist).toString());
+                        } else {
+                            //Update existing checklist
+                            checklistManager.update(checklist);
+                        }
                     }
                     else{
-                        //Update existing checklist
-                        checklistManager.update(checklist);
+                        //This is a child checklist
+                        HashSet<Long> checkedIds = new HashSet<>();
+                        for (ChecklistItem item : savedChecklist.getItems()){
+                            if (item.isCheckable() && item.isChecked()){
+                                checkedIds.add(item.getId());
+                            }
+                        }
+                        savedChecklist.getItems().clear();
+                        for (ChecklistItem item : checklist.getItems()){
+                            if (checkedIds.contains(item.getId())){
+                                item.setChecked(true);
+                            }
+                            savedChecklist.getItems().add(item);
+                        }
+                        //All of the checklist items have been updated with the server's copy
+                        //and are rechecked according to the local checking
+                        checklistManager.update(savedChecklist);
+                        if (savedChecklist.getLastModified().after(checklist.getLastModified())) {
+                            //The checked items need to be sent to the server
+                            new ChecklistSyncTask(null, new ArrayList<Checklist>(), savedChecklist, context).execute(ChecklistSyncTask.CREATE_CHECKLIST,
+                                    ChecklistSyncTask.jsonifyChecklist(savedChecklist).toString());
+                        } else {
+                            //Update existing checklist
+                            checklistManager.update(checklist);
+                        }
                     }
                 }
             }
