@@ -67,7 +67,7 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
         switch(type) {
             case SAVE_CHECKLIST_ORDER:
                 token = sharedPref.getString(context.getString(R.string.token_key), "");
-                doRequest(jsonifyChecklistOrder().toString().getBytes(), "POST",
+                doRequest(("order="+jsonifyChecklistOrder()).toString().getBytes(), "POST",
                         baseUrl + SAVE_CHECKLIST_ORDER, token);
                 return checklistManager.getAllChecklists();
             case GET_ALL_CHECKLISTS:
@@ -77,7 +77,7 @@ public class ChecklistSyncTask extends AsyncTask<String, Void, List<Checklist>> 
                 break;
             case CREATE_CHECKLIST:
                 token = sharedPref.getString(context.getString(R.string.token_key), "");
-                result = doRequest(params[1].getBytes(), "POST", baseUrl + CREATE_CHECKLIST, token);
+                result = doRequest(("checklist="+params[1]).getBytes(), "POST", baseUrl + CREATE_CHECKLIST, token);
                 try {
                     //This method is called on new unsaved checklists and already saved checklists
                     if (checklist.isUnSynced()){

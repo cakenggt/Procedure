@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
             checklists.get(i).setOrder(i);
         }
         checklistManager.saveAllChecklists(checklists);
-        if (apiRequest == null || apiRequest.isCancelled()) {
+        if (apiRequest == null || apiRequest.isCancelled() || apiRequest.getStatus() == AsyncTask.Status.FINISHED) {
             //Only save the checklist order if there are no other api requests, since it overwrites other data
             apiRequest = new ChecklistSyncTask(null, checklists, null, this).execute(ChecklistSyncTask.SAVE_CHECKLIST_ORDER);
         }
